@@ -19,22 +19,17 @@ namespace BatchDemo.Models
         [JsonIgnore]
         [BatchIdValidation]
         public Guid BatchId { get; set; }
-        //[JsonIgnore]
-        //public string? Status { get; set; } = "InComplete";
-        //[JsonIgnore]
-        //public DateTime? BatchPublishedDate { get; set; }
-        //[JsonIgnore]
-        //public ICollection<Files>? Files { get; set; }
-
+     
         [Required(ErrorMessage = "BusinessUnit can't be empty.")]
         [JsonPropertyOrder(3)]
-
         public string? BusinessUnit { get; set; }
         [JsonPropertyOrder(4)]
+        
         public AccessControlLayer? ACL { get; set; }
         [BatchAttributeValidation]
         [JsonPropertyOrder(5)]
         public ICollection<Attributes>? Attributes { get; set; }
+        
         [JsonPropertyOrder(6)]
         public DateTime? ExpiryDate { get; set; }
     }

@@ -80,6 +80,7 @@ namespace BatchDemo.Controllers
             // return StatusCode(StatusCodes.Status201Created);
             return CreatedAtAction("batch", new { batchId = BatchId });
         }
+        
         private void SaveBatchInFile(string jsonResult, Guid batchId)
         {
             // Construct path with BatchId as directory name 
@@ -136,8 +137,9 @@ namespace BatchDemo.Controllers
             //}
 
             Batch batch = new Batch();
-            JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
-            batch = JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
+            //JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
+            //batch = JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
+            batch = LoadAndDeserializeBatch(batchId);
 
             BatchInfo batchInfo = new BatchInfo();
             batchInfo.BatchId = batch!.BatchId;
@@ -149,7 +151,15 @@ namespace BatchDemo.Controllers
 
             return Ok(batchInfo);
         }
-
+        //private JsonDocument Loadbatch(Guid batchId)
+        //{
+        //return _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
+        //}
+        private Batch LoadAndDeserializeBatch(Guid batchId)
+        {
+            BatchDemo.Models.JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
+            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
+        }
         /// <summary>
         /// 
         /// </summary>
