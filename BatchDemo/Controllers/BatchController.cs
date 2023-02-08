@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Diagnostics.CodeAnalysis;
+using BatchDemo.Services.Interface;
 
 namespace BatchDemo.Controllers
 {
@@ -33,7 +35,8 @@ namespace BatchDemo.Controllers
         private readonly ILogger<BatchController> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
-        private string _path = @"D:\OneDrive\OneDrive - Mastek Limited\0_Learning\Projects\BatchDemo\BatchDemo\Files\json\";
+        private readonly IBatchUtility _batchUtility;
+        private string _path;
 
         /// <summary>
         /// Constructor for injecting DI 
@@ -41,11 +44,13 @@ namespace BatchDemo.Controllers
         /// <param name="logger"></param>
         /// <param name="unitOfWork"></param>
         /// <param name="configuration"></param>
-        public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
+        public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration, IBatchUtility batchUtility)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _batchUtility = batchUtility;
+            _path = Directory.GetCurrentDirectory() + "\\Files\\Batches";
         }
 
         /// <summary>
@@ -84,7 +89,7 @@ namespace BatchDemo.Controllers
         private void SaveBatchInFile(string jsonResult, Guid batchId)
         {
             // Construct path with BatchId as directory name 
-            _path += batchId.ToString();
+            _path += "/" + batchId.ToString();
             if (!System.IO.Directory.Exists(_path))
             {
                 System.IO.Directory.CreateDirectory(_path);
@@ -92,11 +97,7 @@ namespace BatchDemo.Controllers
 
             // Concatenating file name in path as batchid.
             _path += "/" + batchId.ToString() + ".json";
-            if (System.IO.File.Exists(_path))
-            {
-                _logger.LogInformation("File {0} deleted from the path {1} ",batchId,_path);
-                System.IO.File.Delete(_path);
-            }
+            DeleteFileIfExists(_path);
 
             using (var tw = new StreamWriter(_path, true))
             {
@@ -104,6 +105,16 @@ namespace BatchDemo.Controllers
                 tw.WriteLine(jsonResult.ToString());
                 tw.Close();
             }
+        }
+        [ExcludeFromCodeCoverage]
+        private void DeleteFileIfExists(string path)
+        {
+            if (System.IO.File.Exists(path))
+            {
+                _logger.LogInformation("File deleted from the path {1} ", path);
+                System.IO.File.Delete(_path);
+            }
+
         }
 
         /// <summary>
@@ -129,57 +140,11 @@ namespace BatchDemo.Controllers
         [HttpGet("batch/{batchId}")]
         public IActionResult Batch(Guid batchId)
         {
-            //Guid guidResult;
-
-            //if (!Guid.TryParse(batchId.ToString(), out guidResult))
-            //{
-            //    return BadRequest("BatchId should be in valid GUID format.");
-            //}
-
             Batch batch = new Batch();
-            //JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
-            //batch = JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
-            batch = LoadAndDeserializeBatch(batchId);
-
+            batch = _batchUtility.DeserializeJsonDocument(batchId);
             BatchInfo batchInfo = new BatchInfo();
-            batchInfo.BatchId = batch!.BatchId;
-            batchInfo.Attributes = batch.Attributes;
-            batchInfo.BusinessUnit = batch.BusinessUnit;
-            batchInfo.ExpiryDate = batch.ExpiryDate;
-            batchInfo.ACL= batch.ACL;
-            batchInfo.Files = new List<Files>() { new Files() {Attributes=batch.Attributes } };
-
+            batchInfo = _batchUtility.BatchToBatchInfoConverter(batch);
             return Ok(batchInfo);
         }
-        //private JsonDocument Loadbatch(Guid batchId)
-        //{
-        //return _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
-        //}
-        private Batch LoadAndDeserializeBatch(Guid batchId)
-        {
-            BatchDemo.Models.JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
-            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        //[HttpPost("LoadBatch")]
-        //public IActionResult LoadBatch()
-        //{
-        //    Batch batch = new Batch();
-        //    BatchData batchData = new BatchData();
-        //    batch = batchData.DataOperations();
-
-        //    string JsonResult = JsonConvert.SerializeObject(batch);
-        //    using (var tw = new StreamWriter(_path, true))
-        //    {
-        //        tw.WriteLine(JsonResult.ToString());
-        //        tw.Close();
-        //    }
-
-
-        //    return Ok();
-        //}
     }
 }

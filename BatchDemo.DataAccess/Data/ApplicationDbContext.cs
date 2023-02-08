@@ -9,14 +9,14 @@ using BatchDemo.DataAccess.Data;
 
 namespace BatchDemo.DataAccess
 {
-    public class ApplicationDbContext : DbContext, IApplicationDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             :base(options)
         {
 
         }
-        public DbSet<JsonDocument>? JsonDocument { get; set; }
+        public DbSet<JsonDocument>? JsonDocuments { get; set; }
 
         //public void MarkAsModified(JsonDocument item)
         //{

@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using BatchDemo.Utility;
 using BatchDemo.Utility.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Extensions
 {
     /// <summary>
     /// 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
         /// <summary>

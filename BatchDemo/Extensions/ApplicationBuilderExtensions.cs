@@ -1,10 +1,12 @@
 ﻿using BatchDemo.Middleware;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Extensions
 {
     /// <summary>
     /// 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class ApplicationBuilderExtensions
     {
         /// <summary>

@@ -9,5 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BatchDemo.Models\BatchDemo.Models.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage" />
+  </ItemGroup>
 </Project>

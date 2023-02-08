@@ -18,7 +18,7 @@ namespace BatchDemo.DataAccess.Repository
         }
         public void Update(JsonDocument obj)
         {
-            var objFromDb = _db.JsonDocument?.FirstOrDefault(u => u.BatchId == obj.BatchId);
+            var objFromDb = _db.JsonDocuments?.FirstOrDefault(u => u.BatchId == obj.BatchId);
             if (objFromDb != null)
             {
                 objFromDb.Document = obj.Document;

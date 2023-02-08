@@ -9,6 +9,9 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
+using BatchDemo.Services;
+using BatchDemo.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +41,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddScoped<IBatchUtility, BatchUtility>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -69,3 +72,6 @@ app.MapControllers();
 // Add Correlation ID Middleware
 // app.AddCorrelationIdMiddleware();
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public partial class Program { }

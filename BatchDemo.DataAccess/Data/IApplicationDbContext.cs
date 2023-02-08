@@ -5,7 +5,7 @@ namespace BatchDemo.DataAccess.Data
 {
    public interface IApplicationDbContext:IDisposable
     {
-        DbSet<JsonDocument> JsonDocument { get; }
+        DbSet<JsonDocument> JsonDocuments { get; }
         int SaveChanges();
        // void MarkAsModified(JsonDocument item);
     }

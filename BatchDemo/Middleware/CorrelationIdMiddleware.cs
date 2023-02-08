@@ -1,12 +1,15 @@
 ﻿using BatchDemo.Utility.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Middleware
 {
     /// <summary>
     /// 
     /// </summary>
+    /// 
+    [ExcludeFromCodeCoverage]
     public class CorrelationIdMiddleware
     {
         private readonly RequestDelegate _next;
