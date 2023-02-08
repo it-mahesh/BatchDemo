@@ -47,8 +47,8 @@ namespace BatchDemo.UnitTests
             
             BatchDemo.Models.JsonDocument jsonDocument = new BatchDemo.Models.JsonDocument() { BatchId = batch.BatchId, Document = null };
             A.CallTo(() => _batchUtility.GetJsonByBatchId(A<Guid>.Ignored)).Returns(jsonDocument);
-            var jsonResult = _batchUtility.GetJsonByBatchId(batch.BatchId);
-            var jsonResult2= batchUtility.GetJsonByBatchId(batch.BatchId);
+            var jsonResult = _batchUtility.GetJsonByBatchId(batch?.BatchId);
+            var jsonResult2= batchUtility.GetJsonByBatchId(batch?.BatchId);
             Assert.That(jsonResult, Is.Not.Null);
             Assert.That(jsonResult.BatchId, Is.EqualTo(batch.BatchId));
         }

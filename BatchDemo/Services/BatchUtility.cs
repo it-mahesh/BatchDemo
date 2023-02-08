@@ -14,7 +14,7 @@ namespace BatchDemo.Services
             _unitOfWork = unitOfWork;
         }
 
-        public JsonDocument GetJsonByBatchId(Guid batchId)
+        public JsonDocument GetJsonByBatchId(Guid? batchId)
         {
             JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
             return jsonDocument;
@@ -24,10 +24,10 @@ namespace BatchDemo.Services
         /// </summary>
         /// <param name="batchId"></param>
         /// <returns></returns>
-        public Batch DeserializeJsonDocument(Guid batchId)
+        public Batch DeserializeJsonDocument(Guid? batchId)
         {
             JsonDocument jsonDocument = GetJsonByBatchId(batchId);
-            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
+            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);            
         }
         public BatchInfo BatchToBatchInfoConverter(Batch batch)
         {

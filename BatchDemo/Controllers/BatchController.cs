@@ -44,6 +44,7 @@ namespace BatchDemo.Controllers
         /// <param name="logger"></param>
         /// <param name="unitOfWork"></param>
         /// <param name="configuration"></param>
+        /// <param name="batchUtility"></param>
         public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration, IBatchUtility batchUtility)
         {
             _logger = logger;
@@ -89,14 +90,15 @@ namespace BatchDemo.Controllers
         private void SaveBatchInFile(string jsonResult, Guid batchId)
         {
             // Construct path with BatchId as directory name 
-            _path += "/" + batchId.ToString();
+            _path += "\\" + batchId.ToString();
+
             if (!System.IO.Directory.Exists(_path))
             {
                 System.IO.Directory.CreateDirectory(_path);
             }
 
             // Concatenating file name in path as batchid.
-            _path += "/" + batchId.ToString() + ".json";
+            _path += "\\" + batchId.ToString() + ".json";
             DeleteFileIfExists(_path);
 
             using (var tw = new StreamWriter(_path, true))
@@ -144,6 +146,10 @@ namespace BatchDemo.Controllers
             batch = _batchUtility.DeserializeJsonDocument(batchId);
             BatchInfo batchInfo = new BatchInfo();
             batchInfo = _batchUtility.BatchToBatchInfoConverter(batch);
+            if (batchInfo.BatchId == null)
+            {
+                return NotFound(StatusCodes.Status404NotFound);
+            }
             return Ok(batchInfo);
         }
     }

@@ -12,7 +12,7 @@ namespace BatchDemo.Models
     {
         //public Batch? Batch { get; set; }
         [JsonPropertyOrder(1)]
-        public new Guid BatchId { get; set; }
+        public new Guid? BatchId { get; set; }
         [JsonPropertyOrder(2)]
         public string? Status { get; set; } = "InComplete";
         [JsonPropertyOrder(7)]

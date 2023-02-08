@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using BatchDemo.Services;
 using BatchDemo.Services.Interface;
+using BatchDemo.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +68,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+// Register for exception handling. Order is important to call
+app.ConfigureBuiltInExceptionHandler();
 app.MapControllers();
 // Add Correlation ID Middleware
 // app.AddCorrelationIdMiddleware();
