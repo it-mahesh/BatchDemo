@@ -5,16 +5,26 @@ using Newtonsoft.Json;
 
 namespace BatchDemo.Services
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class BatchUtility : IBatchUtility
     {
         private readonly IUnitOfWork _unitOfWork;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="unitOfWork"></param>
         public BatchUtility(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-
-        public JsonDocument GetJsonByBatchId(Guid? batchId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
+        private JsonDocument GetJsonByBatchId(Guid? batchId)
         {
             JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
             return jsonDocument;
@@ -27,8 +37,13 @@ namespace BatchDemo.Services
         public Batch DeserializeJsonDocument(Guid? batchId)
         {
             JsonDocument jsonDocument = GetJsonByBatchId(batchId);
-            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);            
+            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
         public BatchInfo BatchToBatchInfoConverter(Batch batch)
         {
             return new BatchInfo()

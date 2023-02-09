@@ -89,6 +89,10 @@ namespace BatchDemo.UnitTests
         [TestCaseSource(nameof(NotExistsGuid))]
         public void GetBatch_WhenNotFound_ReturnNotFound(Guid batchId)
         {
+            IFileService _fileService = A.Fake<IFileService>();
+            ICollection<Files> files = new List<Files> { new Files { FileName = "dummy.txt", FileSize = 100, Hash = "xyz", MimeType = "application/text" } };
+            A.CallTo(() => _fileService.GetBatchFiles(A<string>.Ignored)).Returns(files);
+
             var result = _controller.Batch(batchId) as NotFoundObjectResult;
             Assert.That(result?.StatusCode, Is.EqualTo(404));
         }

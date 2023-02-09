@@ -13,7 +13,7 @@ namespace BatchDemo.Models
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             //var batch = (Batch)validationContext.ObjectInstance;
-            List<string> lsterrors = new List<string>();
+            List<string> lsterrors = new();
             IList<Attributes> attributes = new List<Attributes>();
             attributes = (List<Attributes>)value;
 
@@ -28,7 +28,7 @@ namespace BatchDemo.Models
             }
             if (lsterrors.Count > 0)
             {
-                ValidationResult validationResult = new ValidationResult("");
+                ValidationResult validationResult = new("");
                 foreach (var error in lsterrors)
                 {
                     validationResult.ErrorMessage +=" "+ error;
@@ -39,14 +39,6 @@ namespace BatchDemo.Models
             {
                 return ValidationResult.Success;
             }
-
-            //return (attributes != null && string.IsNullOrWhiteSpace(attributes.Key) && string.IsNullOrWhiteSpace(attributes.Value))
-            //    ? ValidationResult.Success
-            //    : new ValidationResult("Attributes should be at least 18 years old.");
-
-            //return (batch.Attributes.Count > 10)
-            //    ? ValidationResult.Success
-            //    : new ValidationResult("Attributes should be at least 18 years old.");
         }
     }
 }

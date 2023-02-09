@@ -9,7 +9,7 @@ namespace BatchDemo.Models
     public class Files
     {
         public string FileName { get; set; } = "string";
-        public int FileSize { get; set; } = 0;
+        public long FileSize { get; set; } = 0;
         public string MimeType { get; set; } = "string";
         public string Hash { get; set; } = "string";
         public ICollection<Attributes>? Attributes { get; set; }

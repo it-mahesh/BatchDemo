@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,6 +23,10 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Diagnostics.CodeAnalysis;
 using BatchDemo.Services.Interface;
+using static NuGet.Packaging.PackagingConstants;
+using Microsoft.AspNetCore.StaticFiles;
+using BatchDemo.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace BatchDemo.Controllers
 {
@@ -142,10 +147,17 @@ namespace BatchDemo.Controllers
         [HttpGet("batch/{batchId}")]
         public IActionResult Batch(Guid batchId)
         {
+            // Set path of folder for supplied batchId.
+             string folderPath = Directory.GetCurrentDirectory() + "\\Files\\Batches\\"+batchId.ToString();
+            //string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue <string>("BatchesFolderPath") + batchId.ToString();
             Batch batch = new Batch();
+            FileService fileService = new FileService();
             batch = _batchUtility.DeserializeJsonDocument(batchId);
             BatchInfo batchInfo = new BatchInfo();
             batchInfo = _batchUtility.BatchToBatchInfoConverter(batch);
+            // Set static files details located at batchid folder.
+            batchInfo.Files= fileService.GetBatchFiles(folderPath);
+            
             if (batchInfo.BatchId == null)
             {
                 return NotFound(StatusCodes.Status404NotFound);
@@ -153,4 +165,6 @@ namespace BatchDemo.Controllers
             return Ok(batchInfo);
         }
     }
+
+    
 }

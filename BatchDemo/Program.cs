@@ -75,5 +75,8 @@ app.MapControllers();
 // app.AddCorrelationIdMiddleware();
 app.Run();
 
+/// <summary>
+/// 
+/// </summary>
 [ExcludeFromCodeCoverage]
 public partial class Program { }

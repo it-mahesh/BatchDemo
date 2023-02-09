@@ -7,10 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Exceptions
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ExcludeFromCodeCoverage]
     public static class ExceptionMiddlewareExtensions
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
         public async static void ConfigureBuiltInExceptionHandler(this IApplicationBuilder app)
         {
             app.UseExceptionHandler(appError =>
