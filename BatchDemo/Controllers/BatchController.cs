@@ -158,9 +158,13 @@ namespace BatchDemo.Controllers
             // Set static files details located at batchid folder.
             batchInfo.Files= fileService.GetBatchFiles(folderPath);
             
-            if (batchInfo.BatchId == null)
+            if (batchInfo.BatchId is null)
             {
-                return NotFound(StatusCodes.Status404NotFound);
+                //return NotFound(StatusCodes.Status404NotFound);
+                ModelStateDictionary modelState=new ModelStateDictionary();
+                modelState.AddModelError("BatchId ", "BatchId not found.");
+                //return new ValidationResultModel(modelState);
+                return NotFound(new ValidationResultModel(modelState));
             }
             return Ok(batchInfo);
         }

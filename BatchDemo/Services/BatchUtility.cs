@@ -2,6 +2,7 @@
 using BatchDemo.Models;
 using BatchDemo.Services.Interface;
 using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Services
 {
@@ -11,6 +12,7 @@ namespace BatchDemo.Services
     public class BatchUtility : IBatchUtility
     {
         private readonly IUnitOfWork _unitOfWork;
+
         /// <summary>
         /// 
         /// </summary>
@@ -37,7 +39,14 @@ namespace BatchDemo.Services
         public Batch DeserializeJsonDocument(Guid? batchId)
         {
             JsonDocument jsonDocument = GetJsonByBatchId(batchId);
-            return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document ?? string.Empty);
+            if (jsonDocument is null)
+            {
+                return new Batch();
+            }
+            else 
+            {
+                return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document);
+            }
         }
         /// <summary>
         /// 

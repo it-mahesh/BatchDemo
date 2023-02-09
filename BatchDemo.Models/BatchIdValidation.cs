@@ -10,11 +10,11 @@ namespace BatchDemo.Models
 {
     public class BatchIdValidation : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             Guid guidResult;
 
-            if (Guid.TryParse(value.ToString(), out guidResult))
+            if (value is not null && Guid.TryParse(value.ToString(), out guidResult))
             {
                 return ValidationResult.Success;
             }

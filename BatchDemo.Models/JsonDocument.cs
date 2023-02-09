@@ -9,7 +9,7 @@ namespace BatchDemo.Models
     {
         [Key]
         public Guid? BatchId { get; set; }
-        public string? Document { get; set; }
+        public string Document { get; set; } = string.Empty;
     }
 
 }

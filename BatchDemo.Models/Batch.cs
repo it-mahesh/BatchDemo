@@ -17,7 +17,7 @@ namespace BatchDemo.Models
     public class Batch
     {
         [JsonIgnore]
-        [BatchIdValidation]
+        // [BatchIdValidation]
         public Guid? BatchId { get; set; }
      
         [Required(ErrorMessage = "BusinessUnit can't be empty.")]

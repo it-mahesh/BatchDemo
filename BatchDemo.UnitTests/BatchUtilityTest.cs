@@ -19,6 +19,7 @@ using BatchDemo.Services.Interface;
 using BatchDemo.Services;
 using static System.Net.WebRequestMethods;
 using System.Text.Json;
+using BatchDemo.DataAccess.Repository;
 
 namespace BatchDemo.UnitTests
 {
@@ -71,7 +72,7 @@ namespace BatchDemo.UnitTests
             Assert.That(jsonResult.BatchId, Is.EqualTo(batch.BatchId));
         }
         [Test]
-        public void DeserializeJsonDocument_ReturnData()
+        public void DeserializeJsonDocument_BatchIdFound()
         {
             BatchUtility batchUtility = new BatchUtility(_unitOfWork);
 
@@ -84,6 +85,15 @@ namespace BatchDemo.UnitTests
             var jsonResult2 = batchUtility.DeserializeJsonDocument(batch.BatchId);
             Assert.That(jsonResult, Is.Not.Null);
             Assert.That(jsonResult.BatchId, Is.EqualTo(batch.BatchId));
+        }
+        [Test]
+        public void DeserializeJsonDocument_BatchIdNotFound()
+        {
+            BatchUtility batchUtility = new BatchUtility(_unitOfWork);
+            Guid nonExistanceBatchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            A.CallTo(() => _unitOfWork.JsonDocument.GetFirstOrDefault(A<Expression<Func<BatchDemo.Models.JsonDocument, bool> >>.Ignored,A<string>.Ignored,A<bool>.Ignored)).Returns(null);
+            var jsonResult = batchUtility.DeserializeJsonDocument(nonExistanceBatchId);
+            Assert.That(jsonResult.BatchId, Is.Null);
         }
     }
 }
