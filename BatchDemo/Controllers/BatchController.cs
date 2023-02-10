@@ -148,8 +148,8 @@ namespace BatchDemo.Controllers
         public IActionResult Batch(Guid batchId)
         {
             // Set path of folder for supplied batchId.
-             string folderPath = Directory.GetCurrentDirectory() + "\\Files\\Batches\\"+batchId.ToString();
-            //string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue <string>("BatchesFolderPath") + batchId.ToString();
+             //string folderPath = Directory.GetCurrentDirectory() + "\\Files\\Batches\\"+batchId.ToString();
+            string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue <string>("BatchesFolderPath") + batchId.ToString();
             Batch batch = new Batch();
             FileService fileService = new FileService();
             batch = _batchUtility.DeserializeJsonDocument(batchId);

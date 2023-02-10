@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BatchDemo.Models;
 using System.Reflection.Emit;
-using BatchDemo.DataAccess.Data;
 
 namespace BatchDemo.DataAccess
 {
@@ -18,14 +17,11 @@ namespace BatchDemo.DataAccess
         }
         public DbSet<JsonDocument>? JsonDocuments { get; set; }
 
-        //public void MarkAsModified(JsonDocument item)
-        //{
-        //    Entry(item).State = EntityState.Modified;
-        //}
-
-        protected override void OnModelCreating(ModelBuilder builder) 
+        protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
-            base.OnModelCreating(builder);
+            //  base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<JsonDocument>().HasKey(a => a.BatchId);
+            modelBuilder.Entity<JsonDocument>().Property(a => a.Document).IsRequired();
         }
 
     }

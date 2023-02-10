@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace BatchDemo.Services
 {
@@ -62,10 +63,35 @@ namespace BatchDemo.Services
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        public string CreateSHA512(string strData)
+        {
+            var message = Encoding.UTF8.GetBytes(strData);
+            using (var alg = SHA512.Create())
+            {
+                string hex = "";
+
+                var hashValue = alg.ComputeHash(message);
+                foreach (byte x in hashValue)
+                {
+                    hex += String.Format("{0:x2}", x);
+                }
+                return hex;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="folderPath"></param>
         public ICollection<Files> GetBatchFiles(string folderPath)
         {
             ICollection<Files> files = new List<Files>();
+            ICollection<Attributes> attributes= new List<Attributes>
+            { 
+            new Attributes{ Key="read-only", Value="true" },
+            new Attributes{ Key="archive", Value="false" }
+            };
             DirectoryInfo di = new DirectoryInfo(folderPath);
             FileInfo[] fileNames;
             try
@@ -83,6 +109,7 @@ namespace BatchDemo.Services
                     FileName = fi.Name,
                     FileSize = fi.Length,
                     MimeType = GetMimeTypeForFileExtension(fi.FullName),
+                    Attributes = attributes,
                     Hash = GetHashCode(fi.FullName, new MD5CryptoServiceProvider())
                 });
             }

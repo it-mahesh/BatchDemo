@@ -58,13 +58,13 @@ namespace BatchDemo.UnitTests
         [Test]
         public void BatchToBatchInfoConverter_ReturnData()
         {
-            BatchUtility batchUtility = new BatchUtility(_unitOfWork);
+            BatchUtility batchUtility = new(_unitOfWork);
 
             _batchUtility = A.Fake<IBatchUtility>();
-            Batch batch = new Batch();
+            Batch batch = new();
             batch = DemoBatchData.LoadBatch();
 
-            BatchInfo batchInfo = new BatchInfo() { BatchId=batch.BatchId,BusinessUnit=batch.BusinessUnit };
+            BatchInfo batchInfo = new (){ BatchId=batch.BatchId,BusinessUnit=batch.BusinessUnit };
             A.CallTo(() => _batchUtility.BatchToBatchInfoConverter(A<Batch>.Ignored)).Returns(batchInfo);
             var jsonResult = _batchUtility.BatchToBatchInfoConverter(batch);
             var jsonResult2 = batchUtility.BatchToBatchInfoConverter(batch);
@@ -74,10 +74,10 @@ namespace BatchDemo.UnitTests
         [Test]
         public void DeserializeJsonDocument_BatchIdFound()
         {
-            BatchUtility batchUtility = new BatchUtility(_unitOfWork);
+            BatchUtility batchUtility = new(_unitOfWork);
 
             _batchUtility = A.Fake<IBatchUtility>();
-            Batch batch = new Batch();
+            Batch batch = new();
             batch = DemoBatchData.LoadBatch();
 
             A.CallTo(() => _batchUtility.DeserializeJsonDocument(A<Guid>.Ignored)).Returns(batch);
@@ -89,8 +89,8 @@ namespace BatchDemo.UnitTests
         [Test]
         public void DeserializeJsonDocument_BatchIdNotFound()
         {
-            BatchUtility batchUtility = new BatchUtility(_unitOfWork);
-            Guid nonExistanceBatchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            BatchUtility batchUtility = new(_unitOfWork);
+            Guid nonExistanceBatchId = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
             A.CallTo(() => _unitOfWork.JsonDocument.GetFirstOrDefault(A<Expression<Func<BatchDemo.Models.JsonDocument, bool> >>.Ignored,A<string>.Ignored,A<bool>.Ignored)).Returns(null);
             var jsonResult = batchUtility.DeserializeJsonDocument(nonExistanceBatchId);
             Assert.That(jsonResult.BatchId, Is.Null);

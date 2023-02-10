@@ -1,1 +1,1 @@
-{"BatchId":"d53c237c-4383-4d44-8df5-dd46b06e575b","BusinessUnit":"Mastek","ACL":{"ReadUsers":["User1","User2"],"ReadGroups":["Group1,Group2"]},"Attributes":[{"Key":"size","Value":"200"}],"ExpiryDate":"2023-02-07T16:30:54.756Z"}
+{"BatchId":"d53c237c-4383-4d44-8df5-dd46b06e575b","BusinessUnit":"Mastek","ACL":{"ReadUsers":["User1","User2"],"ReadGroups":["Group1,Group2"]},"Attributes":[{"Key":"archive","Value":"true"}],"ExpiryDate":"2023-02-07T16:30:54.756Z"}

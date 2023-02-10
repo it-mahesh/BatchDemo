@@ -7,7 +7,6 @@ namespace BatchDemo.Models
 {
     public class JsonDocument
     {
-        [Key]
         public Guid? BatchId { get; set; }
         public string Document { get; set; } = string.Empty;
     }

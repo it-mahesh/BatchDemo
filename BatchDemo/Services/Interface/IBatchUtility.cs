@@ -12,12 +12,6 @@ namespace BatchDemo.Services.Interface
         /// </summary>
         /// <param name="batchId"></param>
         /// <returns></returns>
-        // public JsonDocument GetJsonByBatchId(Guid? batchId);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="batchId"></param>
-        /// <returns></returns>
         public Batch DeserializeJsonDocument(Guid? batchId);
         /// <summary>
         /// 
