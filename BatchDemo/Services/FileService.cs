@@ -36,50 +36,30 @@ namespace BatchDemo.Services
 
             return contentType;
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="filePath"></param>
-        /// <param name="cryptoService"></param>
         /// <returns></returns>
         [ExcludeFromCodeCoverage]
-        private string GetHashCode(string filePath, HashAlgorithm cryptoService)
+        private string CreateHash(string filePath)
         {
-            // create or use the instance of the crypto service provider
-            // this can be either MD5, SHA1, SHA256, SHA384 or SHA512
-            using (cryptoService)
+            // var message = Encoding.UTF8.GetBytes(strData);
+            using (var fileStream = new FileStream(filePath,
+                                               FileMode.Open,
+                                               FileAccess.Read,
+                                               FileShare.ReadWrite))
             {
-                using (var fileStream = new FileStream(filePath,
-                                                       FileMode.Open,
-                                                       FileAccess.Read,
-                                                       FileShare.ReadWrite))
+                using (var alg = SHA512.Create())
                 {
-                    var hash = cryptoService.ComputeHash(fileStream);
+                    var hash = alg.ComputeHash(fileStream);
                     var hashString = Convert.ToBase64String(hash);
                     return hashString.TrimEnd('=');
                 }
+
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="strData"></param>
-        /// <returns></returns>
-        //public string CreateSHA512(string strData)
-        //{
-        //    var message = Encoding.UTF8.GetBytes(strData);
-        //    using (var alg = SHA512.Create())
-        //    {
-        //        string hex = "";
-
-        //        var hashValue = alg.ComputeHash(message);
-        //        foreach (byte x in hashValue)
-        //        {
-        //            hex += String.Format("{0:x2}", x);
-        //        }
-        //        return hex;
-        //    }
-        //}
         /// <summary>
         /// 
         /// </summary>
@@ -87,12 +67,12 @@ namespace BatchDemo.Services
         public ICollection<Files> GetBatchFiles(string folderPath)
         {
             ICollection<Files> files = new List<Files>();
-            ICollection<Attributes> attributes= new List<Attributes>
-            { 
+            ICollection<Attributes> attributes = new List<Attributes>
+            {
             new Attributes{ Key="read-only", Value="true" },
             new Attributes{ Key="archive", Value="false" }
             };
-            DirectoryInfo di = new DirectoryInfo(folderPath);
+            DirectoryInfo di = new(folderPath);
             FileInfo[] fileNames;
             try
             {
@@ -101,7 +81,7 @@ namespace BatchDemo.Services
             catch (Exception)
             {
                 return files;
-            }            
+            }
             foreach (System.IO.FileInfo fi in fileNames)
             {
                 files.Add(new Files
@@ -110,7 +90,7 @@ namespace BatchDemo.Services
                     FileSize = fi.Length,
                     MimeType = GetMimeTypeForFileExtension(fi.FullName),
                     Attributes = attributes,
-                    Hash = GetHashCode(fi.FullName, new MD5CryptoServiceProvider())
+                    Hash = CreateHash(fi.FullName)
                 });
             }
             return files;

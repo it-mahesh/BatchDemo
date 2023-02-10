@@ -45,7 +45,7 @@ namespace BatchDemo.Services
             }
             else 
             {
-                return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document);
+                return JsonConvert.DeserializeObject<Batch>(jsonDocument.Document)!;
             }
         }
         /// <summary>

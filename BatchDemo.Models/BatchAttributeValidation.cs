@@ -14,9 +14,16 @@ namespace BatchDemo.Models
         {
             //var batch = (Batch)validationContext.ObjectInstance;
             List<string> lsterrors = new();
-            IList<Attributes> attributes = new List<Attributes>();
-            attributes = (List<Attributes>)value;
-
+            IList<Attributes> attributes; 
+            if (value==null)
+            {
+                attributes = new List<Attributes>();
+            }
+            else
+            {
+                attributes = (List<Attributes>)value;
+            }
+            
             // For attributes if present on request should have both key and value if not it should respond bad request.
             foreach (var attribute in attributes)
             {
@@ -37,7 +44,7 @@ namespace BatchDemo.Models
             }
             else
             {
-                return ValidationResult.Success;
+                return ValidationResult.Success!;
             }
         }
     }

@@ -35,7 +35,7 @@ namespace BatchDemo.Exceptions
                         {
                             StatusCode = context.Response.StatusCode,
                             Message = contextFeature.Error.Message,
-                            Path = contextRequest.Path
+                            Path = contextRequest!.Path
                         }.ToString());
                     }
                 });

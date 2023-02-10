@@ -54,7 +54,7 @@ namespace BatchDemo.DataAccess.Repository
                         query = query.Include(includeProp);
                     }
                 }
-                return query.FirstOrDefault();
+                return query.FirstOrDefault()!;
             }
             else
             {
@@ -68,7 +68,7 @@ namespace BatchDemo.DataAccess.Repository
                         query = query.Include(includeProp);
                     }
                 }
-                return query.FirstOrDefault();
+                return query.FirstOrDefault()!;
             }
             
         }

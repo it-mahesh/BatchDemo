@@ -36,7 +36,7 @@ namespace BatchDemo.Middleware
         {
             if (context.Request.Headers.TryGetValue(_correlationIdHeader, out var correlationId))
             {
-                correlationIdGenerator.Set(correlationId);
+                correlationIdGenerator.Set(correlationId!);
                 return correlationId;
             }
             else
