@@ -10,7 +10,7 @@ namespace BatchDemo.Models
 {
     public class BatchAttributeValidation : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
             //var batch = (Batch)validationContext.ObjectInstance;
             List<string> lsterrors = new();
