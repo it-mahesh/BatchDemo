@@ -12,24 +12,23 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using BatchDemo.Services;
 using BatchDemo.Services.Interface;
-using BatchDemo.Exceptions;
+using BatchDemo.Logger;
 
 var builder = WebApplication.CreateBuilder(args);
-
-try
-{
-    var logger = new LoggerConfiguration()
+//try
+//{
+   var logger = new LoggerConfiguration()
    .ReadFrom.Configuration(builder.Configuration)
    .Enrich.FromLogContext()
    .CreateLogger();
 
-    builder.Logging.ClearProviders();
-    builder.Logging.AddSerilog(logger);
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+   builder.Logging.ClearProviders();
+   builder.Logging.AddSerilog(logger);
+//}
+//finally
+//{
+//  Log.CloseAndFlush();
+//}
 
 builder.Services.AddControllers();
 // Register custom defined Correlation ID Generator
@@ -69,10 +68,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 // Register for exception handling. Order is important to call
-app.ConfigureBuiltInExceptionHandler();
-app.MapControllers();
+//app.ConfigureExceptionHandler(logger);
+app.UseGlobalExceptionMiddleware(logger);
 // Add Correlation ID Middleware
 // app.AddCorrelationIdMiddleware();
+app.MapControllers();
 app.Run();
 
 /// <summary>

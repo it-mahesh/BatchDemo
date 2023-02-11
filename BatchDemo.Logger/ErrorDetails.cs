@@ -7,13 +7,12 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 
-namespace BatchDemo.Models.ViewModels
+namespace BatchDemo.Logger
 {
-    public class ErrorVM
+    public class ErrorDetails
     {
         public int StatusCode { get; set; }
         public string? Message { get; set; }
-        public string? Path { get; set; }
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);
