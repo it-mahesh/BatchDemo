@@ -79,7 +79,7 @@ namespace BatchDemo.Controllers
             Guid BatchId = Guid.NewGuid();
             batch.BatchId = BatchId;
             string JsonResult = JsonConvert.SerializeObject(batch);
-            JsonDocument jsonDocument = new JsonDocument
+            JsonDocument jsonDocument = new()
             {
                 BatchId = BatchId,
                 Document = JsonResult
@@ -91,7 +91,7 @@ namespace BatchDemo.Controllers
             // return StatusCode(StatusCodes.Status201Created);
             return CreatedAtAction("batch", new { batchId = BatchId });
         }
-        
+
         private void SaveBatchInFile(string jsonResult, Guid batchId)
         {
             // Construct path with BatchId as directory name 
@@ -106,19 +106,17 @@ namespace BatchDemo.Controllers
             _path += "\\" + batchId.ToString() + ".json";
             DeleteFileIfExists(_path);
 
-            using (var tw = new StreamWriter(_path, true))
-            {
-                _logger.LogInformation("Writing contete in json file {0}", batchId);
-                tw.WriteLine(jsonResult.ToString());
-                tw.Close();
-            }
+            using var tw = new StreamWriter(_path, true);
+            _logger.LogInformation("Writing contete in json file {batchId}", batchId);
+            tw.WriteLine(jsonResult.ToString());
+            tw.Close();
         }
         [ExcludeFromCodeCoverage]
         private void DeleteFileIfExists(string path)
         {
             if (System.IO.File.Exists(path))
             {
-                _logger.LogInformation("File deleted from the path {1} ", path);
+                _logger.LogInformation("File deleted from the path {path} ", path);
                 System.IO.File.Delete(_path);
             }
 
@@ -148,20 +146,19 @@ namespace BatchDemo.Controllers
         public IActionResult Batch(Guid batchId)
         {
             // Set path of folder for supplied batchId.
-             //string folderPath = Directory.GetCurrentDirectory() + "\\Files\\Batches\\"+batchId.ToString();
-            string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue <string>("BatchesFolderPath") + batchId.ToString();
-            Batch batch = new Batch();
-            FileService fileService = new FileService();
+            //string folderPath = Directory.GetCurrentDirectory() + "\\Files\\Batches\\"+batchId.ToString();
+            string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue<string>("BatchesFolderPath") + batchId.ToString();
+            Batch batch;
+            FileService fileService = new();
             batch = _batchUtility.DeserializeJsonDocument(batchId);
-            BatchInfo batchInfo = new BatchInfo();
-            batchInfo = _batchUtility.BatchToBatchInfoConverter(batch);
+            BatchInfo batchInfo = _batchUtility.BatchToBatchInfoConverter(batch);
             // Set static files details located at batchid folder.
-            batchInfo.Files= fileService.GetBatchFiles(folderPath);
-            
+            batchInfo.Files = fileService.GetBatchFiles(folderPath);
+
             if (batchInfo.BatchId is null)
             {
                 //return NotFound(StatusCodes.Status404NotFound);
-                ModelStateDictionary modelState=new ModelStateDictionary();
+                ModelStateDictionary modelState = new();
                 modelState.AddModelError("BatchId ", "BatchId not found.");
                 //return new ValidationResultModel(modelState);
                 return NotFound(new ValidationResultModel(modelState));
