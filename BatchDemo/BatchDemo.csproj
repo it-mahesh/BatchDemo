@@ -38,6 +38,7 @@
 		<Folder Include="Files\json\" />
 		<Folder Include="Files\images\" />
 		<ProjectReference Include="..\BatchDemo.DataAccess\BatchDemo.DataAccess.csproj" />
+		<ProjectReference Include="..\BatchDemo.Logger\BatchDemo.Logger.csproj" />
 		<ProjectReference Include="..\BatchDemo.Models\BatchDemo.Models.csproj" />
 		<ProjectReference Include="..\BatchDemo.Utility\BatchDemo.Utility.csproj" />
 	</ItemGroup>
