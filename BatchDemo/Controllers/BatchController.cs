@@ -165,6 +165,37 @@ namespace BatchDemo.Controllers
             }
             return Ok(batchInfo);
         }
+        /// <summary>
+        /// Add a file to the batch
+        /// </summary>
+        /// <param name="batchId">A Batch ID</param>
+        /// <param name="fileName">FileName for the new file. Must be unique in the batch (but can be the same as another file in another batch). 
+        /// File names don't include a path.</param>
+        /// <param name="fileMimeType">Optional. The MIME content type of the file. The default type is application/octet-stream.</param>
+        /// <param name="fileContentSize">The final size of the file in bytes.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Creates a file in the batch. To upload the content of the file, one or more uploadBlockOfFile requests will need to be made followed by a 
+        /// 'putBlocksInFile' request to complete the file.
+        /// </remarks>
+        /// <response code="201">Created</response>
+        /// <response code="400">Bad request - Could be a bad batch ID; a batch ID that doesn't exist; a bad file name.</response>
+        /// <response code="401">Unauthorized - either you have not provided any credentials, or your credentials are not recognised.</response>
+        /// <response code="403">Forbidden - you have been authorized, but you are not allowed to access this resource.</response>
+        [HttpPost("batch/{batchId}/{fileName}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ValidateModel]
+        public IActionResult Batch(Guid batchId,string fileName,[FromHeader(Name = "X-MIME-TYPE")] string fileMimeType
+            , [FromHeader(Name = "X-Content-Size")] float fileContentSize)
+        {
+            Request.Headers.TryGetValue("X-MIME-TYPE", out var mimeType);
+            Request.Headers.TryGetValue("X-Content-Size", out var contentSize);
+            return CreatedAtAction("batch", new { batchId = batchId });
+        }
+
     }
 
 
