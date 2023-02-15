@@ -1,32 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
 using BatchDemo.DataAccess.Repository.IRepository;
-using Microsoft.AspNetCore.Authorization;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
 using BatchDemo.Models;
-using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
-using System.IO;
-using System.ComponentModel.Design.Serialization;
-using BatchDemo.DataAccess.Repository;
-using System.Net;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using BatchDemo.Utility;
-using BatchDemo.Utility.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Diagnostics.CodeAnalysis;
 using BatchDemo.Services.Interface;
-using static NuGet.Packaging.PackagingConstants;
-using Microsoft.AspNetCore.StaticFiles;
 using BatchDemo.Services;
-using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
 
 namespace BatchDemo.Controllers
 {
@@ -41,6 +22,7 @@ namespace BatchDemo.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         private readonly IBatchUtility _batchUtility;
+        private readonly IBatchBlobService _blobService;
         private string _path;
 
         /// <summary>
@@ -50,13 +32,16 @@ namespace BatchDemo.Controllers
         /// <param name="unitOfWork"></param>
         /// <param name="configuration"></param>
         /// <param name="batchUtility"></param>
-        public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration, IBatchUtility batchUtility)
+        /// <param name="blobService"></param>
+        public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration
+            ,IBatchUtility batchUtility, IBatchBlobService blobService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _batchUtility = batchUtility;
             _path = Directory.GetCurrentDirectory() + "\\Files\\Batches";
+            _blobService = blobService;
         }
 
         /// <summary>
@@ -88,6 +73,9 @@ namespace BatchDemo.Controllers
             _unitOfWork.Save();
 
             SaveBatchInFile(JsonResult, BatchId);
+            
+            _blobService.CreateContainer(BatchId.ToString());
+
             // return StatusCode(StatusCodes.Status201Created);
             return CreatedAtAction("batch", new { batchId = BatchId });
         }
@@ -189,10 +177,19 @@ namespace BatchDemo.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ValidateModel]
         public IActionResult Batch(Guid batchId,string fileName,[FromHeader(Name = "X-MIME-TYPE")] string fileMimeType
-            , [FromHeader(Name = "X-Content-Size")] float fileContentSize)
+            ,[FromHeader(Name = "X-Content-Size")] float fileContentSize
+           )
         {
+            // D53C237C-4383-4D44-8DF5-DD46B06E575B
+            string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue<string>("BatchesFolderPath") + batchId.ToString();
+            string filePath = folderPath + "\\" + fileName;
+            
             Request.Headers.TryGetValue("X-MIME-TYPE", out var mimeType);
             Request.Headers.TryGetValue("X-Content-Size", out var contentSize);
+           
+            
+            _blobService.PostFileAsync(batchId.ToString(), filePath, mimeType!, contentSize!);
+
             return CreatedAtAction("batch", new { batchId = batchId });
         }
 

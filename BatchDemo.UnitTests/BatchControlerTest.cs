@@ -32,7 +32,7 @@ namespace BatchDemo.UnitTests
         private IUnitOfWork? _unitOfWork;
         private IConfiguration? _configuration;
         private IBatchUtility _batchUtility;
-        
+        private IBatchBlobService _blobService;
 
         [SetUp]
         public void SetUp()
@@ -41,7 +41,8 @@ namespace BatchDemo.UnitTests
             _unitOfWork = A.Fake<IUnitOfWork>();
             _configuration = A.Fake<IConfiguration>();
             _batchUtility = A.Fake<IBatchUtility>();
-            _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility);
+            _blobService = A.Fake<IBatchBlobService>();
+            _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility, _blobService);
         }
 
         [Test]

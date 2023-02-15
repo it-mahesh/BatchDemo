@@ -16,6 +16,7 @@ namespace BatchDemo.DataAccess
 
         }
         public DbSet<JsonDocument>? JsonDocuments { get; set; }
+        public DbSet<Files>? Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {

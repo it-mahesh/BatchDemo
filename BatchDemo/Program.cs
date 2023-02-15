@@ -17,13 +17,13 @@ using BatchDemo.Logger;
 var builder = WebApplication.CreateBuilder(args);
 //try
 //{
-   var logger = new LoggerConfiguration()
-   .ReadFrom.Configuration(builder.Configuration)
-   .Enrich.FromLogContext()
-   .CreateLogger();
+var logger = new LoggerConfiguration()
+.ReadFrom.Configuration(builder.Configuration)
+.Enrich.FromLogContext()
+.CreateLogger();
 
-   builder.Logging.ClearProviders();
-   builder.Logging.AddSerilog(logger);
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 //}
 //finally
 //{
@@ -42,6 +42,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IBatchUtility, BatchUtility>();
+builder.Services.AddScoped<IBatchBlobService, BatchBlobService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
