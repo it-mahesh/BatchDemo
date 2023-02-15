@@ -25,19 +25,19 @@ namespace BatchDemo.Services
     public class BatchBlobService : IBatchBlobService
     {
         private readonly IConfiguration _configuration;
-        private static string? _azureStorageConnection;
+        // private static string? _azureStorageConnection;
 
-        private string GetAzureStorageConnection()
+        private string GetAzureStorageKeyVaultConnection()
         {
-            string tenantId = _configuration.GetSection("KeyVaultConfig:TenantId").Value;
-            string clientId = _configuration.GetSection("KeyVaultConfig:ClientId").Value;
-            string clientSecret = _configuration.GetSection("KeyVaultConfig:ClientSecretId").Value;
+            string? tenantId = _configuration.GetSection("KeyVaultConfig:TenantId").Value;
+            string? clientId = _configuration.GetSection("KeyVaultConfig:ClientId").Value;
+            string? clientSecret = _configuration.GetSection("KeyVaultConfig:ClientSecretId").Value;
             
-            ClientSecretCredential clientSecretCredential=new ClientSecretCredential(tenantId, clientId, clientSecret);
+            ClientSecretCredential clientSecretCredential=new(tenantId, clientId, clientSecret);
 
-            string keyVaultUrl = _configuration.GetSection("KeyVaultConfig:KVUrl").Value;
-            string secretName = _configuration.GetSection("KeyVaultConfig:SecretName").Value; 
-            SecretClient secretClient = new SecretClient(new Uri(keyVaultUrl),clientSecretCredential);
+            string? keyVaultUrl = _configuration.GetSection("KeyVaultConfig:KVUrl").Value;
+            string? secretName = _configuration.GetSection("KeyVaultConfig:SecretName").Value; 
+            SecretClient secretClient = new(new Uri(keyVaultUrl!),clientSecretCredential);
 
             var secret = secretClient.GetSecret(secretName);
 
@@ -50,7 +50,8 @@ namespace BatchDemo.Services
         public BatchBlobService(IConfiguration configuration)
         {
            _configuration = configuration;
-            _azureStorageConnection = _configuration.GetSection("AzureSettings:StorageAccount").Value;
+            // Get storage account connection from local config file.
+            // _azureStorageConnection = _configuration.GetSection("AzureSettings:StorageAccount").Value;
         }
         /// <summary>
         /// Create a container
@@ -59,14 +60,12 @@ namespace BatchDemo.Services
         /// <returns></returns>
         public BlobContainerClient? CreateContainer(string containerName)
         {
-              //  var blobServiceClient1 = new BlobServiceClient(
-                //        new Uri("https://<storage-account-name>.blob.core.windows.net"),
-                  //      new DefaultAzureCredential());
-                // Create the container
-                
-                BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageConnection);
+            // Create the container
+            string storageConnectionKV = GetAzureStorageKeyVaultConnection();
+            //BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageConnection);
+            BlobServiceClient blobServiceClient = new(storageConnectionKV);
 
-                BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
+            BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
 
                 if (container.Exists())
                 {
@@ -88,16 +87,18 @@ namespace BatchDemo.Services
             {
                 string fileName = Path.GetFileName(filePath);
 
-                BlobHttpHeaders blobHttpHeaders= new BlobHttpHeaders();
-                blobHttpHeaders.ContentType = mimeType;
+                BlobHttpHeaders blobHttpHeaders = new()
+                {
+                    ContentType = mimeType
+                };
                 
                 var fileUrl = "";
-                string storageConnection = GetAzureStorageConnection();
-                BlobContainerClient containerClient = new BlobContainerClient(storageConnection, containerName);
+                string storageConnectionKV = GetAzureStorageKeyVaultConnection();
+                BlobContainerClient containerClient = new(storageConnectionKV, containerName);
                 //BlobContainerClient containerClient = new BlobContainerClient(_azureStorageConnection, containerName);
                 //ListBlobsFlatListing(containerClient,100);
                 BlobClient blobClient = containerClient.GetBlobClient(fileName);
-                using FileStream fileStream = File.OpenRead(filePath); //new FileStream(filePath,FileMode.Open,FileAccess.Read))
+                using FileStream fileStream = File.OpenRead(filePath); 
                     await blobClient.UploadAsync(fileStream, blobHttpHeaders);
                 //await blobClient.SetHttpHeadersAsync(blobHttpHeaders);
                 //fileStream.Close();
