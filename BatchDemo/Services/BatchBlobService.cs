@@ -16,7 +16,6 @@ namespace BatchDemo.Services
         private readonly IConfiguration _configuration;
         private readonly IKeyVaultManager _keyVaultManager;
         // private static string? _azureStorageConnection;
-
         private string GetAzureStorageKeyVaultConnection()
         {
             string? tenantId = _configuration.GetSection("KeyVaultConfig:TenantId").Value;

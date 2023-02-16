@@ -200,7 +200,35 @@ namespace BatchDemo.Controllers
 
             Request.Headers.TryGetValue("X-MIME-TYPE", out var mimeType);
             Request.Headers.TryGetValue("X-Content-Size", out var contentSize);
+            
+            // Validate if BatchId not exists
+            JsonDocument jsonDocument = _unitOfWork.JsonDocument.GetFirstOrDefault(u => u.BatchId == batchId);
+            if (jsonDocument is null)
+            {
+                ModelStateDictionary modelState = new();
+                modelState.AddModelError("BatchId ", "BatchId doesn't exists.");
+                return NotFound(new ValidationResultModel(modelState));
+            }
 
+            // validate if file doesn't exists in batch directory
+            if (!System.IO.File.Exists(filePath))
+            {
+                ModelStateDictionary modelState = new();
+                modelState.AddModelError("FileNotFound ", "File doesn't exists.");
+                return NotFound(new ValidationResultModel(modelState));
+            }
+
+            // Store files details into database
+            Files files = new()
+            {
+                BatchId = batchId,
+                FileName = fileName,
+                MimeType = mimeType!
+            // ,Attributes = new List<Attributes>{ new Attributes { Key = "size", Value = "200mb" }, new Attributes { Key = "type", Value = "json" } }
+            };
+
+            _unitOfWork.Files.Add(files);
+            _unitOfWork.Save();
 
             _blobService.PostFileAsync(batchId.ToString(), filePath, mimeType!, contentSize!);
 
