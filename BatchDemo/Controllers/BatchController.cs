@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BatchDemo.DataAccess.Repository.IRepository;
+﻿using BatchDemo.DataAccess.Repository.IRepository;
 using BatchDemo.Models;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using BatchDemo.Utility;
-using System.Diagnostics.CodeAnalysis;
-using BatchDemo.Services.Interface;
 using BatchDemo.Services;
-using Azure.Storage.Blobs;
+using BatchDemo.Services.Interface;
+using BatchDemo.Utility;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Controllers
 {
@@ -24,7 +23,6 @@ namespace BatchDemo.Controllers
         private readonly IBatchUtility _batchUtility;
         private readonly IBatchBlobService _blobService;
         private string _path;
-
         /// <summary>
         /// Constructor for injecting DI 
         /// </summary>
@@ -34,7 +32,7 @@ namespace BatchDemo.Controllers
         /// <param name="batchUtility"></param>
         /// <param name="blobService"></param>
         public BatchController(ILogger<BatchController> logger, IUnitOfWork unitOfWork, IConfiguration configuration
-            ,IBatchUtility batchUtility, IBatchBlobService blobService)
+            , IBatchUtility batchUtility, IBatchBlobService blobService)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -42,6 +40,22 @@ namespace BatchDemo.Controllers
             _batchUtility = batchUtility;
             _path = Directory.GetCurrentDirectory() + "\\Files\\Batches";
             _blobService = blobService;
+            //// D53C237C-4383-4D44-8DF5-DD46B06E575B
+            ////var kvUrl = _configuration.GetSection("KeyVaultConfig:KVUrl").Value;  
+            ////var secretClient = new SecretClient(new Uri(kvUrl), new DefaultAzureCredential());
+            ////var sqlConnString = secretClient.GetSecret("dbConnection");
+            //
+            //string? tenantId = _configuration.GetSection("KeyVaultConfig:TenantId").Value;
+            //string? clientId = _configuration.GetSection("KeyVaultConfig:ClientId").Value;
+            //string? clientSecret = _configuration.GetSection("KeyVaultConfig:ClientSecretId").Value;
+            //ClientSecretCredential clientSecretCredential = new(tenantId, clientId, clientSecret);
+            //string? keyVaultUrl = _configuration.GetSection("KeyVaultConfig:KVUrl").Value;
+            //string? secretName = _configuration.GetSection("KeyVaultConfig:DbConnSecretName").Value;
+
+            //SecretClient secretClient = new(new Uri(keyVaultUrl!), clientSecretCredential);
+
+            //var secret = secretClient.GetSecret(secretName);
+            //var val = secret.Value.Value;
         }
 
         /// <summary>
@@ -73,7 +87,7 @@ namespace BatchDemo.Controllers
             _unitOfWork.Save();
 
             SaveBatchInFile(JsonResult, BatchId);
-            
+
             _blobService.CreateContainer(BatchId.ToString());
 
             // return StatusCode(StatusCodes.Status201Created);
@@ -176,23 +190,22 @@ namespace BatchDemo.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ValidateModel]
-        public IActionResult Batch(Guid batchId,string fileName,[FromHeader(Name = "X-MIME-TYPE")] string fileMimeType
-            ,[FromHeader(Name = "X-Content-Size")] float fileContentSize
+        public IActionResult Batch(Guid batchId, string fileName, [FromHeader(Name = "X-MIME-TYPE")] string fileMimeType
+            , [FromHeader(Name = "X-Content-Size")] float fileContentSize
            )
         {
             // D53C237C-4383-4D44-8DF5-DD46B06E575B
             string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue<string>("BatchesFolderPath") + batchId.ToString();
             string filePath = folderPath + "\\" + fileName;
-            
+
             Request.Headers.TryGetValue("X-MIME-TYPE", out var mimeType);
             Request.Headers.TryGetValue("X-Content-Size", out var contentSize);
-           
-            
+
+
             _blobService.PostFileAsync(batchId.ToString(), filePath, mimeType!, contentSize!);
 
             return CreatedAtAction("batch", new { batchId = batchId });
         }
-
     }
 
 

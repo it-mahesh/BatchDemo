@@ -1,25 +1,9 @@
-﻿using BatchDemo.Controllers;
-using BatchDemo.DataAccess.Repository.IRepository;
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BatchDemo.DataAccess.Repository.IRepository;
 using BatchDemo.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Reflection;
-using NUnit.Framework;
-using System.Linq.Expressions;
-using BatchDemo.Services.Interface;
 using BatchDemo.Services;
-using static System.Net.WebRequestMethods;
-using System.Text.Json;
-using BatchDemo.DataAccess.Repository;
+using BatchDemo.Services.Interface;
+using FakeItEasy;
+using System.Linq.Expressions;
 
 namespace BatchDemo.UnitTests
 {

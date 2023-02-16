@@ -1,14 +1,9 @@
-﻿using BatchDemo.Services.Interface;
-using BatchDemo.DataAccess;
-//using BatchDemo.Models.Enum;
+﻿//using BatchDemo.Models.Enum;
 using BatchDemo.Models;
-using Microsoft.EntityFrameworkCore;
-using Azure.Storage.Blobs;
-using System.Configuration;
-using System.Security.Cryptography;
+using BatchDemo.Services.Interface;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+using System.Security.Cryptography;
 
 namespace BatchDemo.Services
 {

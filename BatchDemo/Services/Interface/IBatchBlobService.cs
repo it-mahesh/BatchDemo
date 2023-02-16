@@ -1,6 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using BatchDemo.Models;
-using System.Security.Cryptography;
 //using BatchDemo.Models.Enum;
 namespace BatchDemo.Services.Interface
 {

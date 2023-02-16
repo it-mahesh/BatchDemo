@@ -1,25 +1,11 @@
 ﻿using BatchDemo.Controllers;
 using BatchDemo.DataAccess.Repository.IRepository;
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BatchDemo.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Reflection;
-using NUnit.Framework;
-using System.Linq.Expressions;
 using BatchDemo.Services.Interface;
-using BatchDemo.Services;
-using static System.Net.WebRequestMethods;
-using System.Text.Json;
-using NuGet.ContentModel;
+using FakeItEasy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BatchDemo.UnitTests
 {
@@ -33,6 +19,7 @@ namespace BatchDemo.UnitTests
         private IConfiguration? _configuration;
         private IBatchUtility _batchUtility;
         private IBatchBlobService _blobService;
+        private IKeyVaultManager _keyVaultManager;
 
         [SetUp]
         public void SetUp()
@@ -42,13 +29,14 @@ namespace BatchDemo.UnitTests
             _configuration = A.Fake<IConfiguration>();
             _batchUtility = A.Fake<IBatchUtility>();
             _blobService = A.Fake<IBatchBlobService>();
+            _keyVaultManager = A.Fake<IKeyVaultManager>();
             _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility, _blobService);
         }
 
         [Test]
         public void PostBatch_WhenCreated_ReturnStatus201()
         {
-            Batch batch = new Batch();
+            Batch batch = new();
             batch = DemoBatchData.LoadBatch();
 
             var result =
@@ -64,11 +52,11 @@ namespace BatchDemo.UnitTests
         [TestCaseSource(nameof(ExistsGuid))]
         public void GetBatch_WhenFound_ReturnStatusOK(Guid batchId)
         {
-            Batch batch = new Batch();
+            Batch batch = new();
             batch= DemoBatchData.LoadBatch();
             A.CallTo(() => _batchUtility.DeserializeJsonDocument(A<Guid>.Ignored)).Returns(batch);
 
-            BatchInfo batchInfo = new BatchInfo()
+            BatchInfo batchInfo = new()
             {
                 BatchId = batchId,
                 Attributes = batch.Attributes,
@@ -98,8 +86,8 @@ namespace BatchDemo.UnitTests
             Assert.That(result?.StatusCode, Is.EqualTo(404));
         }
         //static Guid?[] NullAndEmptyGuid = new Guid?[] { null, Guid.Empty, new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
-        static Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
-        static Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
+        static readonly Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
+        static readonly Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
 
         
     }
