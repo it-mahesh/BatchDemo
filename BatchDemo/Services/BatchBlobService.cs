@@ -16,22 +16,7 @@ namespace BatchDemo.Services
         private readonly IConfiguration _configuration;
         private readonly IKeyVaultManager _keyVaultManager;
         // private static string? _azureStorageConnection;
-        private string GetAzureStorageKeyVaultConnection()
-        {
-            string? tenantId = _configuration.GetSection("KeyVaultConfig:TenantId").Value;
-            string? clientId = _configuration.GetSection("KeyVaultConfig:ClientId").Value;
-            string? clientSecret = _configuration.GetSection("KeyVaultConfig:ClientSecretId").Value;
-            
-            ClientSecretCredential clientSecretCredential=new(tenantId, clientId, clientSecret);
-
-            string? keyVaultUrl = _configuration.GetSection("KeyVaultConfig:KVUrl").Value;
-            string? secretName = _configuration.GetSection("KeyVaultConfig:SecretName").Value; 
-            SecretClient secretClient = new(new Uri(keyVaultUrl!),clientSecretCredential);
-
-            var secret = secretClient.GetSecret(secretName);
-
-            return secret.Value.Value;
-        }
+        
         /// <summary>
         /// 
         /// </summary>

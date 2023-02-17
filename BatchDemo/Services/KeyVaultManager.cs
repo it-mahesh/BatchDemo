@@ -1,13 +1,14 @@
 ﻿using Azure.Identity;
-//using BatchDemo.Models.Enum;
 using Azure.Security.KeyVault.Secrets;
 using BatchDemo.Services.Interface;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Services
 {
     /// <summary>
     /// 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class KeyVaultManager : IKeyVaultManager
     {
         private readonly IConfiguration _configuration;

@@ -91,6 +91,7 @@ namespace BatchDemo.UnitTests
         static readonly Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
         static readonly Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
         [Test]
+        [Ignore("Creates Contaier at azure")]
         public void CreateContainer_WhenCreated_ReturnsOk()
         {
             string storageConnectionKV = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage2;AccountKey=wvESjo+QhZKlbk4ZVNzIS+xHmzAqn3wHWGuWq/QVjDgPz7ROTKMWasdr3qQZTWJWno+5on3zYYdV+AStfu+BSA==;EndpointSuffix=core.windows.net";
@@ -107,6 +108,15 @@ namespace BatchDemo.UnitTests
             A.CallTo(() => _blobService.CreateContainer(A<string>.Ignored)).Returns(blobContainerClient);
             BlobContainerClient? containerClient = batchBlobService.CreateContainer("test");
 
+        }
+        [Test]
+        public void PostFile_WhenBatchIdNotExist_ReturnBadRequest()
+        { 
+            Guid batchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            string fileName = batchId.ToString() + ".txt";
+            var result = _controller.Batch(batchId, fileName, "application",0f);
+            Assert.That(result, Is.Not.Null);
+        
         }
     }
 }
