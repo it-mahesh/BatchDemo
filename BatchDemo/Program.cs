@@ -37,7 +37,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.AddScoped<IKeyVaultManager, KeyVaultManager>();
+//builder.Host.ConfigureAppConfiguration((context, config) =>
+//{
+//    var settings = config.Build();
+//    var keyVaultEndpoint = settings["KeyVaultConfig:KVUrl"];
 
+//});
 var dbConnectionString = new KeyVaultManager(builder.Configuration).GetDbConnectionFromAzureVault();//builder.Configuration.Configuration[Configuration[DBConnectionStringSecretIdentifierKey]];
 if (string.IsNullOrEmpty(dbConnectionString))
 {
@@ -64,10 +69,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
-
+app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    
     app.UseSwaggerUI();
 }
 

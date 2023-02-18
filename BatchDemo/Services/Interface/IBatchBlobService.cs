@@ -22,7 +22,7 @@ namespace BatchDemo.Services.Interface
         /// <param name="mimeType"></param>
         /// <param name="contentSize"></param>
         /// <returns></returns>
-        public Task<string> PostFileAsync(string containerName, string filePath, string mimeType, string contentSize);
+        public string PostFile(string containerName, string filePath, string mimeType, string contentSize);
 
     }
 }

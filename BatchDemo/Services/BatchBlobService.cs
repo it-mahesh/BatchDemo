@@ -57,7 +57,7 @@ namespace BatchDemo.Services
         /// <param name="mimeType"></param>
         /// <param name="contentSize"></param>
         /// <returns></returns>
-        public async Task<string> PostFileAsync(string containerName, string filePath, string mimeType,string contentSize)
+        public string PostFile(string containerName, string filePath, string mimeType,string contentSize)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace BatchDemo.Services
                 //ListBlobsFlatListing(containerClient,100);
                 BlobClient blobClient = containerClient.GetBlobClient(fileName);
                 using FileStream fileStream = File.OpenRead(filePath); 
-                    await blobClient.UploadAsync(fileStream, blobHttpHeaders);
+                    blobClient.Upload(fileStream, blobHttpHeaders);
                 //await blobClient.SetHttpHeadersAsync(blobHttpHeaders);
                 //fileStream.Close();
                 fileUrl = blobClient.Uri.AbsoluteUri;
