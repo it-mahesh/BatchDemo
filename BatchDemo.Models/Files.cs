@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Text.Json.Serialization;
 namespace BatchDemo.Models
 {
     public class Files
     {
+        [JsonIgnore]
+        public int Id { get; set; }
+        [JsonIgnore]
+        public Guid? BatchId { get; set; }
         public string FileName { get; set; } = "string";
         public long FileSize { get; set; } = 0;
         public string MimeType { get; set; } = "string";

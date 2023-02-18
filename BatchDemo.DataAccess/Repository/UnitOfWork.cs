@@ -16,9 +16,11 @@ namespace BatchDemo.DataAccess.Repository
         {
             _db = db;
             JsonDocument = new JsonDocumentRepository(_db);
+            Files = new FilesRepository(_db);
         }
 
         public IJsonDocumentRepository JsonDocument { get; private set; }
+        public IFilesRepository Files { get; private set; }
         public void Save()
         {
             _db.SaveChanges();

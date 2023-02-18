@@ -1,25 +1,13 @@
-﻿using BatchDemo.Controllers;
+﻿using Azure.Storage.Blobs;
+using BatchDemo.Controllers;
 using BatchDemo.DataAccess.Repository.IRepository;
-using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BatchDemo.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Reflection;
-using NUnit.Framework;
-using System.Linq.Expressions;
-using BatchDemo.Services.Interface;
 using BatchDemo.Services;
-using static System.Net.WebRequestMethods;
-using System.Text.Json;
-using NuGet.ContentModel;
+using BatchDemo.Services.Interface;
+using FakeItEasy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BatchDemo.UnitTests
 {
@@ -32,7 +20,8 @@ namespace BatchDemo.UnitTests
         private IUnitOfWork? _unitOfWork;
         private IConfiguration? _configuration;
         private IBatchUtility _batchUtility;
-        
+        private IBatchBlobService _blobService;
+        private IKeyVaultManager _keyVaultManager;
 
         [SetUp]
         public void SetUp()
@@ -41,13 +30,15 @@ namespace BatchDemo.UnitTests
             _unitOfWork = A.Fake<IUnitOfWork>();
             _configuration = A.Fake<IConfiguration>();
             _batchUtility = A.Fake<IBatchUtility>();
-            _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility);
+            _blobService = A.Fake<IBatchBlobService>();
+            _keyVaultManager = A.Fake<IKeyVaultManager>();
+            _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility, _blobService);
         }
 
         [Test]
         public void PostBatch_WhenCreated_ReturnStatus201()
         {
-            Batch batch = new Batch();
+            Batch batch = new();
             batch = DemoBatchData.LoadBatch();
 
             var result =
@@ -63,11 +54,11 @@ namespace BatchDemo.UnitTests
         [TestCaseSource(nameof(ExistsGuid))]
         public void GetBatch_WhenFound_ReturnStatusOK(Guid batchId)
         {
-            Batch batch = new Batch();
+            Batch batch = new();
             batch= DemoBatchData.LoadBatch();
             A.CallTo(() => _batchUtility.DeserializeJsonDocument(A<Guid>.Ignored)).Returns(batch);
 
-            BatchInfo batchInfo = new BatchInfo()
+            BatchInfo batchInfo = new()
             {
                 BatchId = batchId,
                 Attributes = batch.Attributes,
@@ -97,9 +88,35 @@ namespace BatchDemo.UnitTests
             Assert.That(result?.StatusCode, Is.EqualTo(404));
         }
         //static Guid?[] NullAndEmptyGuid = new Guid?[] { null, Guid.Empty, new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
-        static Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
-        static Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
+        static readonly Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
+        static readonly Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
+        [Test]
+        [Ignore("Creates Contaier at azure")]
+        public void CreateContainer_WhenCreated_ReturnsOk()
+        {
+            string storageConnectionKV = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage2;AccountKey=wvESjo+QhZKlbk4ZVNzIS+xHmzAqn3wHWGuWq/QVjDgPz7ROTKMWasdr3qQZTWJWno+5on3zYYdV+AStfu+BSA==;EndpointSuffix=core.windows.net";
+            var batchBlobService = new BatchBlobService(_configuration!,_keyVaultManager);
+            BlobContainerClient blobContainerClient= A.Fake<BlobContainerClient>();
+            
+            //blobServiceClient.CreateBlobContainer(storageConnectionKV);
 
+            BlobServiceClient blobServiceClient = A.Fake<BlobServiceClient>();
+
+            //BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
+            //A.CallTo(() => blobServiceClient.CreateBlobContainer("")).MustHaveHappened();
+            A.CallTo(() => _keyVaultManager.GetStorageConnectionFromAzureVault()).Returns(storageConnectionKV);
+            A.CallTo(() => _blobService.CreateContainer(A<string>.Ignored)).Returns(blobContainerClient);
+            BlobContainerClient? containerClient = batchBlobService.CreateContainer("test");
+
+        }
+        [Test]
+        public void PostFile_WhenBatchIdNotExist_ReturnBadRequest()
+        { 
+            Guid batchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            string fileName = batchId.ToString() + ".txt";
+            var result = _controller.Batch(batchId, fileName, "application",0f);
+            Assert.That(result, Is.Not.Null);
         
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace BatchDemo.Logger
             try
             {
                 await _next(httpContext);
-            }
+            }            
             catch (Exception ex)
             {
                 await HandleGlobalExceptionAsync(httpContext, ex,_logger);

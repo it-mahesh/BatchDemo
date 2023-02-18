@@ -1,29 +1,26 @@
+using BatchDemo.DataAccess;
 using BatchDemo.DataAccess.Repository;
 using BatchDemo.DataAccess.Repository.IRepository;
-using BatchDemo.DataAccess;
-using BatchDemo.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
+using BatchDemo.Logger;
 using BatchDemo.Services;
 using BatchDemo.Services.Interface;
-using BatchDemo.Logger;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 //try
 //{
-   var logger = new LoggerConfiguration()
-   .ReadFrom.Configuration(builder.Configuration)
-   .Enrich.FromLogContext()
-   .CreateLogger();
+var logger = new LoggerConfiguration()
+.ReadFrom.Configuration(builder.Configuration)
+.Enrich.FromLogContext()
+.CreateLogger();
 
-   builder.Logging.ClearProviders();
-   builder.Logging.AddSerilog(logger);
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 //}
 //finally
 //{
@@ -39,9 +36,24 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IKeyVaultManager, KeyVaultManager>();
+//builder.Host.ConfigureAppConfiguration((context, config) =>
+//{
+//    var settings = config.Build();
+//    var keyVaultEndpoint = settings["KeyVaultConfig:KVUrl"];
+
+//});
+var dbConnectionString = new KeyVaultManager(builder.Configuration).GetDbConnectionFromAzureVault();//builder.Configuration.Configuration[Configuration[DBConnectionStringSecretIdentifierKey]];
+if (string.IsNullOrEmpty(dbConnectionString))
+{
+    throw new ApplicationException(message: "Failed to get database connection string");
+}
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IBatchUtility, BatchUtility>();
+builder.Services.AddScoped<IBatchBlobService, BatchBlobService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -57,10 +69,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
-
+app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    
     app.UseSwaggerUI();
 }
 
