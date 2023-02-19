@@ -10,8 +10,13 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Azure.Identity;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+//builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 //try
 //{
 var logger = new LoggerConfiguration()
@@ -67,6 +72,11 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
+//builder.Services.AddAzureClients(clientBuilder =>
+//{
+//    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureSettings:StorageAccount:blob"], preferMsi: true);
+//    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureSettings:StorageAccount:queue"], preferMsi: true);
+//});
 
 var app = builder.Build();
 app.UseSwagger();
