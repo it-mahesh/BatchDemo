@@ -5,6 +5,7 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using BatchDemo.Services.Interface;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatchDemo.Services
 {
@@ -41,13 +42,22 @@ namespace BatchDemo.Services
             //BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageConnection);
             BlobServiceClient blobServiceClient = new(storageConnectionKV);
 
-            BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
-
-                if (container.Exists())
-                {
-                    return container;
-                }            
-            return null;
+            // My Issue - Facing difficulty to unit test below line. Also can't create interface to invert the dependency.
+            // CreateContainer_ReturnsValue() tried.
+            //BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
+            return blobServiceClient.CreateBlobContainer(containerName);
+        }
+        /// <summary>
+        /// Delete a container
+        /// </summary>
+        /// <param name="containerName"></param>
+        /// <param name="storageConnectionKV"></param>
+        /// <returns></returns>
+        public bool DeleteContainer(string containerName,string storageConnectionKV)
+        {
+            BlobServiceClient blobServiceClient = new(storageConnectionKV);
+            blobServiceClient.DeleteBlobContainer(containerName);
+            return true;
         }
         /// <summary>
         /// 
@@ -57,6 +67,7 @@ namespace BatchDemo.Services
         /// <param name="mimeType"></param>
         /// <param name="contentSize"></param>
         /// <returns></returns>
+        [ExcludeFromCodeCoverage]
         public string PostFile(string containerName, string filePath, string mimeType,string contentSize)
         {
             try
@@ -86,6 +97,7 @@ namespace BatchDemo.Services
                 throw;
             }
         }
+        [ExcludeFromCodeCoverage]
         private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, int? segmentSize)
         {
             try

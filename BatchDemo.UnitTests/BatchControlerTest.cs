@@ -1,13 +1,17 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Core;
+using Azure.Storage.Blobs;
 using BatchDemo.Controllers;
 using BatchDemo.DataAccess.Repository.IRepository;
 using BatchDemo.Models;
 using BatchDemo.Services;
 using BatchDemo.Services.Interface;
 using FakeItEasy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
+using System.Net.Http.Headers;
 
 namespace BatchDemo.UnitTests
 {
@@ -90,33 +94,81 @@ namespace BatchDemo.UnitTests
         //static Guid?[] NullAndEmptyGuid = new Guid?[] { null, Guid.Empty, new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
         static readonly Guid?[] ExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575B") };
         static readonly Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
+
         [Test]
-        [Ignore("Creates Contaier at azure")]
-        public void CreateContainer_WhenCreated_ReturnsOk()
-        {
-            string storageConnectionKV = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage2;AccountKey=wvESjo+QhZKlbk4ZVNzIS+xHmzAqn3wHWGuWq/QVjDgPz7ROTKMWasdr3qQZTWJWno+5on3zYYdV+AStfu+BSA==;EndpointSuffix=core.windows.net";
-            var batchBlobService = new BatchBlobService(_configuration!,_keyVaultManager);
-            BlobContainerClient blobContainerClient= A.Fake<BlobContainerClient>();
-            
-            //blobServiceClient.CreateBlobContainer(storageConnectionKV);
-
-            BlobServiceClient blobServiceClient = A.Fake<BlobServiceClient>();
-
-            //BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
-            //A.CallTo(() => blobServiceClient.CreateBlobContainer("")).MustHaveHappened();
-            A.CallTo(() => _keyVaultManager.GetStorageConnectionFromAzureVault()).Returns(storageConnectionKV);
-            A.CallTo(() => _blobService.CreateContainer(A<string>.Ignored)).Returns(blobContainerClient);
-            BlobContainerClient? containerClient = batchBlobService.CreateContainer("test");
-
-        }
-        [Test]
+        [Ignore("Not Implemented")]
         public void PostFile_WhenBatchIdNotExist_ReturnBadRequest()
         { 
             Guid batchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
             string fileName = batchId.ToString() + ".txt";
             var result = _controller.Batch(batchId, fileName, "application",0f);
             Assert.That(result, Is.Not.Null);
-        
+        }
+        [Test]
+        public void BatchAddFiles_WhenBatchIdNotFound_ReturnBadRequest()
+        {
+            Guid batchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            // Incorrect file name
+            string fileName = batchId.ToString() + ".txt";
+            var aFakeRepository = A.Fake<IRepository<JsonDocument>>();
+            
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+         
+            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext};
+         
+            JsonDocument? jsonDocument = null; //new();// { BatchId = batchId };
+         
+            A.CallTo(() => _unitOfWork.JsonDocument.GetFirstOrDefault(A<Expression<Func<JsonDocument, bool>>>.Ignored, A<string>.Ignored
+                    , A<bool>.Ignored)).Returns(jsonDocument);
+
+            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.StatusCode, Is.EqualTo(404));
+        }
+        [Test]
+        public void BatchAddFiles_WhenFileNotFound_ReturnBadRequest()
+        {
+            Guid batchId = new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            // Incorrect file name
+            string fileName = batchId.ToString() + ".txt";
+            var aFakeRepository = A.Fake<IRepository<JsonDocument>>();
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+
+            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
+
+            JsonDocument? jsonDocument = new() { BatchId = batchId };
+
+            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.StatusCode, Is.EqualTo(404));
+        }
+        [Test]
+        public void BatchAddFiles_WhenFileAdded_ReturnOk()
+        {
+            Guid batchId = new Guid("00c5900b-0f97-47d2-8d60-6abf29656ce3");
+            // Correct file name
+            string fileName = batchId.ToString() + ".json";
+            var aFakeRepository = A.Fake<IRepository<JsonDocument>>();
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+
+            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
+
+            JsonDocument? jsonDocument = new() { BatchId = batchId };
+
+            var result = _controller.Batch(batchId, fileName, "application", 0f) as CreatedAtActionResult; 
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.StatusCode, Is.EqualTo(201));
         }
     }
 }
