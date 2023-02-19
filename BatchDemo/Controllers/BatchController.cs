@@ -268,12 +268,12 @@ namespace BatchDemo.Controllers
             }
             return CreatedAtAction("batch", new { batchId = batchId });
         }
-        [HttpGet("index")]
-        public string index()
-        {
+        //[HttpGet("index")]
+        //public string index()
+        //{
 
-            return "Hello BatchDemo";
-        }
+        //    return "Hello BatchDemo";
+        //}
         #endregion
     }
 }
