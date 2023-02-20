@@ -29,19 +29,6 @@ namespace BatchDemo.UnitTests
             // SUT
             _batchBlobService = new BatchBlobService(_configuration, _keyVaultManager);
         }
-
-        [Test]
-        [Ignore("Not Implemented")]
-        public void PostFile_ReturnsValue()
-        {
-            //const string containerName = "testcontainer";
-            //string folderPath = Directory.GetCurrentDirectory() + _configuration.GetValue<string>("BatchesFolderPath") + batchId.ToString();
-            //string filePath = folderPath + "\\" + fileName;
-            //const string mimeType = "json";
-            //A.CallTo(() => _batchBlobService!.GetDbConnectionFromAzureVault()).Returns("found");
-            var returnedResult = _batchBlobService?.PostFile("", "", "", "");
-            Assert.That(returnedResult, Is.Not.Null);
-        }
         [Test]
         public void CreateContainer_ReturnsValue()
         {

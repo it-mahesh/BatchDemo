@@ -186,6 +186,9 @@ namespace BatchDemo.Controllers
             if (batchInfo is null)
             {
                 _logger.LogError($"BatchInfo object for {batchId} is null returned from BatchToBatchInfoConverter().");
+                _modelStateDictionary = new();
+                _modelStateDictionary.AddModelError("BatchInfo ", "BatchInfo could not converted.");
+                return NotFound(new ValidationResultModel(_modelStateDictionary));
             }
             // Set static files details located at batchid folder.
             batchInfo!.Files = fileService.GetBatchFiles(folderPath);
@@ -246,13 +249,13 @@ namespace BatchDemo.Controllers
             }
 
             // validate if file doesn't exists in batch directory
-            if (!System.IO.File.Exists(filePath))
+            if (!_batchUtility.IsBatchFileExist(filePath))
             {
                 _logger.LogError($"{fileName} doesn't exist.");
                 _modelStateDictionary = new();
                 _modelStateDictionary.AddModelError("FileNotFound ", "File doesn't exist.");
                 return NotFound(new ValidationResultModel(_modelStateDictionary));
-            }
+            }          
 
             // Store files details into database
             Files files = new()

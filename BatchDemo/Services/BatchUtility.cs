@@ -108,6 +108,20 @@ namespace BatchDemo.Services
             return false;
             
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        [ExcludeFromCodeCoverage]
+        public bool IsBatchFileExist(string filePath)
+        {
+            if (!System.IO.File.Exists(filePath))
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
 }

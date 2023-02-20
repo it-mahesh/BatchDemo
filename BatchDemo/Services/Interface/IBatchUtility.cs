@@ -34,5 +34,11 @@ namespace BatchDemo.Services.Interface
         /// <param name="path"></param>
         /// <returns></returns>
         public bool DirectoryCreated(string path);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public bool IsBatchFileExist(string filePath);
     }
 }
