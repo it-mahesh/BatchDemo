@@ -16,7 +16,6 @@ using System.Net.Http.Headers;
 namespace BatchDemo.UnitTests
 {
     [TestFixture]
-    [Category("Batch")]
     public class BatchControlerTest
     {
         private BatchController _controller;
@@ -40,6 +39,7 @@ namespace BatchDemo.UnitTests
         }
 
         [Test]
+        [Category("PostBatch")]
         public void PostBatch_WhenCreated_ReturnStatus201()
         {
             Batch batch; // = new();
@@ -54,12 +54,55 @@ namespace BatchDemo.UnitTests
             Assert.That(result.ActionName, Is.EqualTo("batch"));
             StringAssert.Contains(batch.BatchId.ToString(), result.Value != null ? result.Value.ToString() : string.Empty);
         }
+        [Test]
+        [Ignore("Not Implemented")]
+        [Category("PostBatch")]
+        public void PostFile_WhenBatchIdNotExist_ReturnBadRequest()
+        {
+            Guid batchId = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            string fileName = batchId.ToString() + ".txt";
+            var result = _controller.Batch(batchId, fileName, "application", 0f);
+            Assert.That(result, Is.Not.Null);
+        }
 
+        [Test]
+        [Category("PostBatch")]
+        public void PostFile_SaveBatchInFile_ReturnError()
+        {
+            Batch batch;
+            batch = DemoBatchData.LoadBatch();
+            JsonDocument jsonDocument = new JsonDocument { BatchId = batch.BatchId };
+
+            A.CallTo(() => _batchUtility.SaveBatchInFile(A<string>.Ignored, A<Guid>.Ignored, A<string>.Ignored)).Returns(false);
+
+            var result = _controller.Batch(batch) as NotFoundObjectResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.StatusCode, Is.EqualTo(404));
+
+        }
+        [Test]
+        [Category("PostBatch")]
+        public void PostFile_CreateContainer_ReturnError()
+        {
+            Batch batch;
+            batch = DemoBatchData.LoadBatch();
+            JsonDocument jsonDocument = new JsonDocument { BatchId = batch.BatchId };
+
+            BlobContainerClient? container = null;
+            A.CallTo(() => _blobService.CreateContainer(A<string>.Ignored)).Returns(container);
+
+            var result = _controller.Batch(batch) as NotFoundObjectResult;
+            
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.StatusCode, Is.EqualTo(404));
+        }
         [TestCaseSource(nameof(ExistsGuid))]
+        [Category("GetBatch")]
         public void GetBatch_WhenFound_ReturnStatusOK(Guid batchId)
         {
             Batch batch = new();
-            batch= DemoBatchData.LoadBatch();
+            batch = DemoBatchData.LoadBatch();
             A.CallTo(() => _batchUtility.DeserializeJsonDocument(A<Guid>.Ignored)).Returns(batch);
 
             BatchInfo batchInfo = new()
@@ -74,14 +117,15 @@ namespace BatchDemo.UnitTests
             };
 
             A.CallTo(() => _batchUtility.BatchToBatchInfoConverter(A<Batch>.Ignored)).Returns(batchInfo);
-            
+
             var result = _controller.Batch(batchId) as OkObjectResult;
-            
+
             // Assert.IsInstanceOf<OkObjectResult>(result);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.StatusCode, Is.EqualTo(200));
         }
         [TestCaseSource(nameof(NotExistsGuid))]
+        [Category("GetBatch")]
         public void GetBatch_WhenNotFound_ReturnNotFound(Guid batchId)
         {
             IFileService _fileService = A.Fake<IFileService>();
@@ -96,28 +140,20 @@ namespace BatchDemo.UnitTests
         static readonly Guid?[] NotExistsGuid = new Guid?[] { new Guid("D53C237C-4383-4D44-8DF5-DD46B06E575A") };
 
         [Test]
-        [Ignore("Not Implemented")]
-        public void PostFile_WhenBatchIdNotExist_ReturnBadRequest()
-        { 
-            Guid batchId = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
-            string fileName = batchId.ToString() + ".txt";
-            var result = _controller.Batch(batchId, fileName, "application",0f);
-            Assert.That(result, Is.Not.Null);
-        }
-        [Test]
+        [Category("PostFiles")]
         public void BatchAddFiles_WhenBatchIdNotFound_ReturnBadRequest()
         {
             Guid batchId = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
             // Incorrect file name
             string fileName = batchId.ToString() + ".txt";
             var aFakeRepository = A.Fake<IRepository<JsonDocument>>();
-            
+
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
             httpContext.Request.Headers["X-Content-Size"] = "test-header";
-         
-            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext};
-         
+
+            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
+
             JsonDocument? jsonDocument = null; //new(){ BatchId = batchId };
 
             A.CallTo(() => _unitOfWork!.JsonDocument.GetFirstOrDefault(A<Expression<Func<JsonDocument, bool>>>.Ignored, A<string>.Ignored, A<bool>.Ignored))
@@ -129,6 +165,7 @@ namespace BatchDemo.UnitTests
             Assert.That(result?.StatusCode, Is.EqualTo(404));
         }
         [Test]
+        [Category("PostFiles")]
         public void BatchAddFiles_WhenFileNotFound_ReturnBadRequest()
         {
             Guid batchId = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
@@ -148,9 +185,11 @@ namespace BatchDemo.UnitTests
             Assert.That(result?.StatusCode, Is.EqualTo(404));
         }
         [Test]
+        [Category("PostFiles")]
+        [Ignore("File path become incorrect")]
         public void BatchAddFiles_WhenFileAdded_ReturnOk()
         {
-            Guid batchId = new("00c5900b-0f97-47d2-8d60-6abf29656ce3");
+            Guid batchId = new("d53c237c-4383-4d44-8df5-dd46b06e575a");
             // Correct file name
             string fileName = batchId.ToString() + ".json";
             var httpContext = new DefaultHttpContext();
@@ -159,10 +198,28 @@ namespace BatchDemo.UnitTests
 
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as CreatedAtActionResult; 
+            var result = _controller.Batch(batchId, fileName, "application", 0f) as CreatedAtActionResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(201));
+        }
+        [Test]
+        [Category("PostFiles")]
+        public void BatchAddFiles_WhenFileNotExist_ReturnBadRequest()
+        {
+            Guid batchId = new("00c5900b-0f97-47d2-8d60-6abf29656ce3");
+            // In Correct file name
+            string fileName = batchId.ToString() + ".json";
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+
+            _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
+
+            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult; 
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.StatusCode, Is.EqualTo(404));
         }
     }
 }

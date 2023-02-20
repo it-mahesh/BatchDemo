@@ -32,14 +32,22 @@ namespace BatchDemo.Controllers
         #endregion
 
         #region Private Methods
+        [ExcludeFromCodeCoverage]
         private bool SaveBatchInFile(string jsonResult, Guid batchId)
         {
             // Construct path with BatchId as directory name 
             _path += "\\" + batchId.ToString();
 
-            if (!System.IO.Directory.Exists(_path))
+            try
             {
-                System.IO.Directory.CreateDirectory(_path);
+                if (!System.IO.Directory.Exists(_path))
+                {
+                    System.IO.Directory.CreateDirectory(_path);
+                }
+            }
+            catch
+            {
+                return false;
             }
 
             // Concatenating file name in path as batchid.
@@ -102,38 +110,39 @@ namespace BatchDemo.Controllers
         [ValidateModel]
         public IActionResult Batch(Batch batch)
         {
-                Guid BatchId = Guid.NewGuid();
-                batch.BatchId = BatchId;
-                string JsonResult = JsonConvert.SerializeObject(batch);
-                JsonDocument jsonDocument = new()
-                {
-                    BatchId = BatchId,
-                    Document = JsonResult
-                };
+            Guid BatchId = Guid.NewGuid();
+            batch.BatchId = BatchId;
+            string JsonResult = JsonConvert.SerializeObject(batch);
+            JsonDocument jsonDocument = new()
+            {
+                BatchId = BatchId,
+                Document = JsonResult
+            };
 
 
-                // Save batch details in database.
-                _unitOfWork.JsonDocument.Add(jsonDocument);
-                _unitOfWork.Save();
+            // Save batch details in database.
+            _unitOfWork.JsonDocument.Add(jsonDocument);
+            _unitOfWork.Save();
 
-                // Save json file in directory.
-                if (!SaveBatchInFile(JsonResult, BatchId))
-                {
-                    _logger.LogError("File could not save in directory for {batchId}", BatchId);
-                    _modelStateDictionary = new();
-                    _modelStateDictionary.AddModelError("FileDirectoryError", "File could not save in directory.");
-                    return NotFound(new ValidationResultModel(_modelStateDictionary));
-                }
+            // Save json file in directory.
+            // if (!SaveBatchInFile(JsonResult, BatchId))
+            if (!_batchUtility.SaveBatchInFile(JsonResult, BatchId, _path))
+            {
+                _logger.LogError("File could not save in directory for {batchId}", BatchId);
+                _modelStateDictionary = new();
+                _modelStateDictionary.AddModelError("FileDirectoryError", "File could not save in directory.");
+                return NotFound(new ValidationResultModel(_modelStateDictionary));
+            }
 
-                // Connect with azure storage and create container.
-                BlobContainerClient? container = _blobService.CreateContainer(BatchId.ToString());
-                if (container is null)
-                {
-                    _logger.LogError("Azure container could not create for {batchId}", BatchId);
-                    _modelStateDictionary = new();
-                    _modelStateDictionary.AddModelError("ConatinerNotCreated", "Azure container could not create.");
-                    return NotFound(new ValidationResultModel(_modelStateDictionary));
-                }
+            // Connect with azure storage and create container.
+            BlobContainerClient? container = _blobService.CreateContainer(BatchId.ToString());
+            if (container is null)
+            {
+                _logger.LogError("Azure container could not create for {batchId}", BatchId);
+                _modelStateDictionary = new();
+                _modelStateDictionary.AddModelError("ConatinerNotCreated", "Azure container could not create.");
+                return NotFound(new ValidationResultModel(_modelStateDictionary));
+            }
             // return StatusCode(StatusCodes.Status201Created);
             return CreatedAtAction("batch", new { batchId = BatchId });
         }

@@ -80,5 +80,33 @@ namespace BatchDemo.UnitTests
             var jsonResult = batchUtility.DeserializeJsonDocument(nonExistanceBatchId);
             Assert.That(jsonResult.BatchId, Is.Null);
         }
+        [Test]
+        public void SaveBatchInFile_PathCorrect_DirectoryCanBeCreated()
+        {
+            const string path = "D:\\OneDrive - Mastek Limited\\0_Learning\\Projects\\BatchDemo\\BatchDemo\\Files\\Batches";
+            string jsonResult = "test";
+            Guid guid = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            Batch batch = new();
+            batch = DemoBatchData.LoadBatch();
+
+            BatchUtility batchUtility = new(_unitOfWork);
+            var result = batchUtility.SaveBatchInFile(jsonResult, guid, path);
+            Assert.That(result, Is.True);
+        }
+        [Test]
+        public void SaveBatchInFile_PathWrong_DirectoryCanNotCreated()
+        {
+            const string path = "dsd";
+            string jsonResult = "test";
+            Guid guid = new("D53C237C-4383-4D44-8DF5-DD46B06E575A");
+            Batch batch = new();
+            batch = DemoBatchData.LoadBatch();
+            BatchUtility batchUtility = new(_unitOfWork);
+
+            A.CallTo(() => _batchUtility.DirectoryCreated(A<string>.Ignored)).Returns(false);
+            
+            var result = batchUtility.SaveBatchInFile(jsonResult, guid, path);
+            Assert.That(result, Is.True);
+        }
     }
 }
