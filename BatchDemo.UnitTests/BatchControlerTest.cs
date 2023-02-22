@@ -24,7 +24,6 @@ namespace BatchDemo.UnitTests
         private IConfiguration? _configuration;
         private IBatchUtility _batchUtility;
         private IBatchBlobService _blobService;
-        // private IKeyVaultManager _keyVaultManager;
 
         [SetUp]
         public void SetUp()
@@ -34,7 +33,7 @@ namespace BatchDemo.UnitTests
             _configuration = A.Fake<IConfiguration>();
             _batchUtility = A.Fake<IBatchUtility>();
             _blobService = A.Fake<IBatchBlobService>();
-            // _keyVaultManager = A.Fake<IKeyVaultManager>();
+            // SUT
             _controller = new BatchController(_logger, _unitOfWork, _configuration, _batchUtility, _blobService);
         }
 

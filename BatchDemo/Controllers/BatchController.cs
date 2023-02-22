@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
@@ -29,47 +30,6 @@ namespace BatchDemo.Controllers
         private readonly IBatchBlobService _blobService;
         private string _path;
         private ModelStateDictionary? _modelStateDictionary;
-        #endregion
-
-        #region Private Methods
-        [ExcludeFromCodeCoverage]
-        private bool SaveBatchInFile(string jsonResult, Guid batchId)
-        {
-            // Construct path with BatchId as directory name 
-            _path += "\\" + batchId.ToString();
-
-            try
-            {
-                if (!System.IO.Directory.Exists(_path))
-                {
-                    System.IO.Directory.CreateDirectory(_path);
-                }
-            }
-            catch
-            {
-                return false;
-            }
-
-            // Concatenating file name in path as batchid.
-            _path += "\\" + batchId.ToString() + ".json";
-            DeleteFileIfExists(_path);
-
-            using var tw = new StreamWriter(_path, true);
-            _logger.LogInformation("Writing contete in json file {batchId}", batchId);
-            tw.WriteLine(jsonResult.ToString());
-            tw.Close();
-            return true;
-        }
-        [ExcludeFromCodeCoverage]
-        private void DeleteFileIfExists(string path)
-        {
-            if (System.IO.File.Exists(path))
-            {
-                _logger.LogInformation("File deleted from the path {path} ", path);
-                System.IO.File.Delete(_path);
-            }
-
-        }
         #endregion
 
         #region Public Methods
@@ -110,6 +70,7 @@ namespace BatchDemo.Controllers
         [ValidateModel]
         public IActionResult Batch(Batch batch)
         {
+            // Generate new GUID and assign to BatchId property.
             Guid BatchId = Guid.NewGuid();
             batch.BatchId = BatchId;
             string JsonResult = JsonConvert.SerializeObject(batch);
@@ -118,7 +79,6 @@ namespace BatchDemo.Controllers
                 BatchId = BatchId,
                 Document = JsonResult
             };
-
 
             // Save batch details in database.
             _unitOfWork.JsonDocument.Add(jsonDocument);
@@ -228,7 +188,7 @@ namespace BatchDemo.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ValidateModel]
         public IActionResult Batch(Guid batchId, string fileName, [FromHeader(Name = "X-MIME-TYPE")] string fileMimeType
-            , [FromHeader(Name = "X-Content-Size")] float fileContentSize
+            , [FromHeader(Name = "X-Content-Size")][Required] long fileContentSize
            )
         {
             // D53C237C-4383-4D44-8DF5-DD46B06E575B
@@ -262,7 +222,8 @@ namespace BatchDemo.Controllers
             {
                 BatchId = batchId,
                 FileName = fileName,
-                MimeType = mimeType!
+                MimeType = mimeType!,
+                FileSize = long.Parse(contentSize!)
                 // ,Attributes = new List<Attributes>{ new Attributes { Key = "size", Value = "200mb" }, new Attributes { Key = "type", Value = "json" } }
             };
 

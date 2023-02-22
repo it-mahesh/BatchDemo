@@ -17,7 +17,7 @@ namespace BatchDemo.Models
     public class Batch
     {
         [JsonIgnore]
-        // [BatchIdValidation]
+        [IgnoreDataMember]
         public Guid? BatchId { get; set; }
      
         [Required(ErrorMessage = "BusinessUnit can't be empty.")]
@@ -33,52 +33,4 @@ namespace BatchDemo.Models
         [JsonPropertyOrder(6)]
         public DateTime? ExpiryDate { get; set; }
     }
-
-    // Batch myDeserializedClass = JsonConvert.DeserializeObject<Batch>(myJsonResponse);
-    /*
-                 //Jsontochsharp.com
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create("http://Your Json Source");
-            request.Method = "GET"; request.Accept = "application/json;odata=verbose"; request.ContentType = "application/json;odata=verbose";
-            WebResponse response = request.GetResponse(); string jSON = null; using (response)
-            {
-                using (var reader = new StreamReader(response.GetResponseStream()))
-                {
-                    try
-                    {
-                        jSON = reader.ReadToEnd();
-                    }
-                    catch (Exception ex) { }
-                }
-            }
-
-            // using javascript serializer
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            RootObject articleData = new RootObject();
-            articleData = serializer.Deserialize<RootObject>(jSON);
-     
-     */
-
-    //public class BatchData
-    //{
-    //    public Batch DataOperations()
-    //    {
-    //        AccessControlLayer accessControlLayer = new AccessControlLayer();
-    //        accessControlLayer.ReadGroups = new List<string> { "Group 1", "Group 2" };
-    //        accessControlLayer.ReadUsers = new List<string> { "User 1", "User 2" };
-
-    //        ICollection<Attributes> attributes = new List<Attributes>
-    //       {
-    //       new Attributes{ Key= "AttKey1", Value = "Attribute Key 1" },
-    //       new Attributes{ Key= "AttKey2", Value = "Attribute Key 2" }
-    //       };
-
-    //        Batch batch = new Batch();
-    //        batch.BusinessUnit = "Demo";
-    //        batch.ExpiryDate = DateTime.Now;
-    //        batch.ACL = accessControlLayer;
-    //        batch.Attributes = attributes;
-
-    //        return batch;
-    //    }
-    //}
 }
