@@ -202,7 +202,7 @@ namespace BatchDemo.UnitTests
             A.CallTo(() => _unitOfWork!.JsonDocument.GetFirstOrDefault(A<Expression<Func<JsonDocument, bool>>>.Ignored, A<string>.Ignored, A<bool>.Ignored))
                 .Returns(jsonDocument);
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult;
+            var result = _controller.Batch(batchId, fileName, "application", 0) as NotFoundObjectResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(404));
@@ -222,7 +222,7 @@ namespace BatchDemo.UnitTests
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
 
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult;
+            var result = _controller.Batch(batchId, fileName, "application", 0) as NotFoundObjectResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(404));
@@ -242,7 +242,7 @@ namespace BatchDemo.UnitTests
             A.CallTo(() => _batchUtility.IsBatchFileExist(A<string>.Ignored)).Returns(true);
             A.CallTo(() => _blobService.PostFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns("ReturnSomeString");
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as CreatedAtActionResult;
+            var result = _controller.Batch(batchId, fileName, "application", 0) as CreatedAtActionResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(201));
@@ -262,7 +262,7 @@ namespace BatchDemo.UnitTests
             A.CallTo(() => _batchUtility.IsBatchFileExist(A<string>.Ignored)).Returns(true);
             A.CallTo(() => _blobService.PostFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(string.Empty);
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult;
+            var result = _controller.Batch(batchId, fileName, "application", 0) as NotFoundObjectResult;
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(404));
@@ -280,7 +280,7 @@ namespace BatchDemo.UnitTests
 
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
 
-            var result = _controller.Batch(batchId, fileName, "application", 0f) as NotFoundObjectResult; 
+            var result = _controller.Batch(batchId, fileName, "application", 0) as NotFoundObjectResult; 
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result?.StatusCode, Is.EqualTo(404));
