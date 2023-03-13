@@ -35,7 +35,7 @@ namespace BatchDemo.UnitTests
             const string containerName = "testcontainer";
 
             // Actual dependency on azure storage connection.
-            const string storageConnection = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage2;AccountKey=wvESjo+QhZKlbk4ZVNzIS+xHmzAqn3wHWGuWq/QVjDgPz7ROTKMWasdr3qQZTWJWno+5on3zYYdV+AStfu+BSA==;EndpointSuffix=core.windows.net";
+            const string storageConnection = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage4;AccountKey=5wyynTLbb5mWo/gbSa0ZztpDZeUO3//I5VjgCknf7XdxlqDy3AAdoKdcezIb1eOHJMWkjtMNItDV+AStj0tRbA==;EndpointSuffix=core.windows.net";
 
             A.CallTo(() => _keyVaultManager!.GetStorageConnectionFromAzureVault()).Returns(storageConnection);
             // A.CallTo(() => aFakeBlobServiceClient.CreateBlobContainer(containerName, A<PublicAccessType>.Ignored, 
@@ -46,18 +46,18 @@ namespace BatchDemo.UnitTests
             //_batchBlobService.DeleteContainer(containerName, storageConnection);
             Assert.That(_batchBlobService, Is.Not.Null);
         }
-        [Test]
-        public void DeleteContainer_ReturnsValue()
-        {
-            const string containerName = "testcontainer";
+        //[Test]
+        //public void DeleteContainer_ReturnsValue()
+        //{
+        //    const string containerName = "testcontainer";
 
-            // Actual dependency on azure storage connection.
-            const string storageConnection = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage2;AccountKey=wvESjo+QhZKlbk4ZVNzIS+xHmzAqn3wHWGuWq/QVjDgPz7ROTKMWasdr3qQZTWJWno+5on3zYYdV+AStfu+BSA==;EndpointSuffix=core.windows.net";
+        //    // Actual dependency on azure storage connection.
+        //    const string storageConnection = "DefaultEndpointsProtocol=https;AccountName=batchdemostorage4;AccountKey=5wyynTLbb5mWo/gbSa0ZztpDZeUO3//I5VjgCknf7XdxlqDy3AAdoKdcezIb1eOHJMWkjtMNItDV+AStj0tRbA==;EndpointSuffix=core.windows.net";
 
-            // Delete the container which was just created during test execution.
-            var result = _batchBlobService!.DeleteContainer(containerName, storageConnection);
-            Assert.That(result, Is.True);
-        }
+        //    // Delete the container which was just created during test execution.
+        //    var result = _batchBlobService!.DeleteContainer(containerName, storageConnection);
+        //    Assert.That(result, Is.True);
+        //}
 
     }
 }

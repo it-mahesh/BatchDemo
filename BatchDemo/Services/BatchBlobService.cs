@@ -47,18 +47,13 @@ namespace BatchDemo.Services
             //BlobContainerClient container = blobServiceClient.CreateBlobContainer(containerName);
             return blobServiceClient.CreateBlobContainer(containerName);
         }
-        /// <summary>
-        /// Delete a container
-        /// </summary>
-        /// <param name="containerName"></param>
-        /// <param name="storageConnectionKV"></param>
-        /// <returns></returns>
-        public bool DeleteContainer(string containerName,string storageConnectionKV)
-        {
-            BlobServiceClient blobServiceClient = new(storageConnectionKV);
-            blobServiceClient.DeleteBlobContainer(containerName);
-            return true;
-        }
+        
+        //public bool DeleteContainer(string containerName,string storageConnectionKV)
+        //{
+        //    BlobServiceClient blobServiceClient = new(storageConnectionKV);
+        //    blobServiceClient.DeleteBlobContainer(containerName);
+        //    return true;
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -97,29 +92,29 @@ namespace BatchDemo.Services
                 throw;
             }
         }
-        [ExcludeFromCodeCoverage]
-        private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, int? segmentSize)
-        {
-            try
-            {
-                // Call the listing operation and return pages of the specified size.
-                var resultSegment = blobContainerClient.GetBlobsAsync()
-                    .AsPages(default, segmentSize);
+        //[ExcludeFromCodeCoverage]
+        //private static async Task ListBlobsFlatListing(BlobContainerClient blobContainerClient, int? segmentSize)
+        //{
+        //    try
+        //    {
+        //        // Call the listing operation and return pages of the specified size.
+        //        var resultSegment = blobContainerClient.GetBlobsAsync()
+        //            .AsPages(default, segmentSize);
 
-                // Enumerate the blobs returned for each page.
-                await foreach (Page<BlobItem> blobPage in resultSegment)
-                {
-                    foreach (BlobItem blobItem in blobPage.Values)
-                    {
-                        Console.WriteLine("Blob name: {0}", blobItem.Name);
-                    }
-                }
-            }
-            catch (RequestFailedException e)
-            {
-                Console.WriteLine(e.Message);
-                throw;
-            }
-        }
+        //        // Enumerate the blobs returned for each page.
+        //        await foreach (Page<BlobItem> blobPage in resultSegment)
+        //        {
+        //            foreach (BlobItem blobItem in blobPage.Values)
+        //            {
+        //                Console.WriteLine("Blob name: {0}", blobItem.Name);
+        //            }
+        //        }
+        //    }
+        //    catch (RequestFailedException e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //        throw;
+        //    }
+        //}
     }
 }

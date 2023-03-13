@@ -236,7 +236,7 @@ namespace BatchDemo.UnitTests
             string fileName = batchId.ToString() + ".json";
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
-            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "200";
 
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
             A.CallTo(() => _batchUtility.IsBatchFileExist(A<string>.Ignored)).Returns(true);
@@ -256,7 +256,7 @@ namespace BatchDemo.UnitTests
             string fileName = batchId.ToString() + ".json";
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Headers["X-MIME-TYPE"] = "test-header";
-            httpContext.Request.Headers["X-Content-Size"] = "test-header";
+            httpContext.Request.Headers["X-Content-Size"] = "200";
 
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContext };
             A.CallTo(() => _batchUtility.IsBatchFileExist(A<string>.Ignored)).Returns(true);
